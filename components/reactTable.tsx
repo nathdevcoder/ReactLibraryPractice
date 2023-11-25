@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   flexRender,
   getPaginationRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 import columns, { data } from "../constant/table";
@@ -17,17 +18,31 @@ import {
   TableFooter,
   TablePagination,
   TableContainer,
-  Paper, 
+  Paper,
+  TextField,
+  Stack, 
 } from "@mui/material";
 import EnhancedTableToolbar from "./snippet/tableToolbar";
 import TableControll from "./snippet/tableControll";  
 import TablePaginationActions from "./snippet/tableActions";
 
+const ResizingDivSx = {
+  height: '100%',
+  width: 4,
+  position: 'absolute',
+  top:0,
+  right:2,
+  cursor: 'grab',
+  '&:hover': {
+    bgcolor: '#C1853B'
+  },
+  '&:active': {
+    cursor: 'grabbing'
+  }
+}
+const ResizingParentDivSx = {position: 'relative', '&:hover > div': {bgcolor: '#C1853B'}}
 
-
-export default function ReactTable() {
-  const [pageSize, setPageSize] = useState(10);
-  const [pageIndex, setPageIndex] = useState(0);
+export default function ReactTable() { 
   const [dense, setDense] = useState(false);
   const {
     getHeaderGroups,
@@ -35,18 +50,18 @@ export default function ReactTable() {
     getFooterGroups,
     getState,
     getPageCount,
+    setPageSize,
+    setPageIndex,
+    setColumnFilters 
   } = useReactTable({
     columns,
-    data,
-    state: {
-      pagination: {
-        pageSize,
-        pageIndex,
-      },
-    },
+    data, 
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    columnResizeMode: 'onChange'
   });
+  const {pagination, columnFilters} = getState() 
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -60,10 +75,19 @@ export default function ReactTable() {
   ) => {
     setPageIndex(newPage);
   };
-
+  const onFilter = (id: string, value: string) => {
+    setColumnFilters(prev=>(prev.filter(pr=> pr.id != id).concat({id, value})))
+  }
+  console.log(columnFilters);
+  
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
+        <Stack direction={'row'} spacing={4} p={4} pb={0}>
+          <TextField onChange={(e)=> onFilter('grocery', e.target.value)} label='Filter Grocery' /> 
+          <TextField onChange={(e)=> onFilter('place', e.target.value)} label='Filter Place'/>
+          <TextField onChange={(e)=> onFilter('price', e.target.value)} label='Filter Price'/>
+        </Stack>
         <TableContainer>
           <EnhancedTableToolbar numSelected={0} />
           <Table
@@ -75,13 +99,19 @@ export default function ReactTable() {
               {getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableCell key={header.id}>
+                    <TableCell key={header.id} width={header.getSize()} sx={ResizingParentDivSx}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      <Box 
+                      sx={ResizingDivSx} 
+                      component={'div'} 
+                      onMouseDown={header.getResizeHandler()}
+                      onTouchStart={header.getResizeHandler()}
+                      ></Box>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -121,8 +151,8 @@ export default function ReactTable() {
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={6}
                   count={getPageCount()}
-                  rowsPerPage={pageSize}
-                  page={getState().pagination.pageIndex}
+                  rowsPerPage={pagination.pageSize}
+                  page={pagination.pageIndex}
                   SelectProps={{
                     inputProps: {
                       "aria-label": "rows per page",

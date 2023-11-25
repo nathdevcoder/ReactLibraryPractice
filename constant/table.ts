@@ -8,6 +8,7 @@ const columnHelper = createColumnHelper<tableData>()
 export default [
     columnHelper.accessor('id', {
         header: 'ID',
+        size: 70,
         cell: info => info.renderValue(),
         footer: info => info.column.id,
     }),
