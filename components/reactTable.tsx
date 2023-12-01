@@ -5,6 +5,8 @@ import {
   flexRender,
   getPaginationRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 import columns, { data } from "../constant/table";
@@ -20,11 +22,20 @@ import {
   TableContainer,
   Paper,
   TextField,
-  Stack, 
+  Stack,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent, 
 } from "@mui/material";
 import EnhancedTableToolbar from "./snippet/tableToolbar";
 import TableControll from "./snippet/tableControll";  
 import TablePaginationActions from "./snippet/tableActions";
+import SortIcon from '@mui/icons-material/Sort';
+import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 
 const ResizingDivSx = {
   height: '100%',
@@ -42,43 +53,78 @@ const ResizingDivSx = {
 }
 const ResizingParentDivSx = {position: 'relative', '&:hover > div': {bgcolor: '#C1853B'}}
 
+const sortable = ['place', 'grocery', 'price', 'amount', 'calorie', 'id']
+
 export default function ReactTable() { 
   const [dense, setDense] = useState(false);
+  const [filterConditions, setFilterConditions] = useState<
+  { id: string; value: string | number }[]
+  >([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "grocery", desc: true },
+    // { id: "price", desc: true },
+    // { id: "amount", desc: true },
+    // { id: "calorie", desc: true },
+    { id: "place", desc: true },
+  ]);
+  const [pageSetting, setPageSetting] = useState({
+    pageIndex: 0,
+    pageSize: 10
+  });
   const {
     getHeaderGroups,
     getRowModel,
-    getFooterGroups,
-    getState,
-    getPageCount,
-    setPageSize,
-    setPageIndex,
-    setColumnFilters 
+    getFooterGroups, 
+    getPageCount, 
   } = useReactTable({
     columns,
     data, 
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    columnResizeMode: 'onChange'
+    columnResizeMode: 'onChange',
+    state: {
+      pagination: pageSetting,
+      columnFilters: filterConditions,
+      sorting: sorting,
+    }
   });
-  const {pagination, columnFilters} = getState() 
+   
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPageIndex(0);
+  ) => { 
+    setPageSetting({
+      pageIndex: 0,
+      pageSize: parseInt(event.target.value, 10)
+    })
   };
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
-  ) => {
-    setPageIndex(newPage);
+  ) => { 
+    setPageSetting(state=> ({...state, pageIndex: newPage}))
   };
   const onFilter = (id: string, value: string) => {
-    setColumnFilters(prev=>(prev.filter(pr=> pr.id != id).concat({id, value})))
+    setFilterConditions(prev=>(prev.filter(pr=> pr.id != id).concat({id, value})))  
+    setPageSetting(state=> ({...state, pageIndex: 0}))
+  } 
+  const onSort = (id: string) => {
+    setSorting(prev=> prev.map(pr=> pr.id == id ? {...pr, desc: !pr.desc}: pr ))
+    setPageSetting(state=> ({...state, pageIndex: 0}))
   }
-  console.log(columnFilters);
+
+  const handleChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[]
+    setSorting(state=>{
+      const newstate = state.filter(fl=> value.includes(fl.id))
+      value.forEach(val=> {
+        if(!newstate.find(ts=>ts.id == val)) newstate.push({id: val, desc: true})
+      }) 
+      return newstate
+    })
+  };
   
   return (
     <Box sx={{ width: "100%" }}>
@@ -87,6 +133,36 @@ export default function ReactTable() {
           <TextField onChange={(e)=> onFilter('grocery', e.target.value)} label='Filter Grocery' /> 
           <TextField onChange={(e)=> onFilter('place', e.target.value)} label='Filter Place'/>
           <TextField onChange={(e)=> onFilter('price', e.target.value)} label='Filter Price'/>
+        </Stack>
+        <FormControl sx={{ width: 300, m:4 }}>
+          <InputLabel id="demo-multiple-name-label">Sort</InputLabel>
+          <Select
+            labelId="demo-multiple-name-label"
+            id="demo-multiple-name"
+            multiple
+            value={sorting.map(st=>st.id)}
+            onChange={handleChange}
+            input={<OutlinedInput label="Name" />} 
+          >
+            {sortable.map((st) => (
+              <MenuItem
+                key={st}
+                value={st} 
+              >
+                {st}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Stack direction={'row'} spacing={4} >
+            {sorting.map(st=>(
+              <Button
+              key={st.id}
+              endIcon={st.desc? <SortIcon /> : <SignalCellularAltIcon/> } 
+              onClick={()=>onSort(st.id)} >
+                {st.id}
+              </Button>
+            ))}
         </Stack>
         <TableContainer>
           <EnhancedTableToolbar numSelected={0} />
@@ -151,8 +227,8 @@ export default function ReactTable() {
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={6}
                   count={getPageCount()}
-                  rowsPerPage={pagination.pageSize}
-                  page={pagination.pageIndex}
+                  rowsPerPage={pageSetting.pageSize}
+                  page={pageSetting.pageIndex}
                   SelectProps={{
                     inputProps: {
                       "aria-label": "rows per page",
