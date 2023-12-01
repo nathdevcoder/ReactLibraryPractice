@@ -3,6 +3,7 @@ import ApiIcon from '@mui/icons-material/Api';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import AccountTreeIcon from '@mui/icons-material/AccountTree'; 
+import FolderCopyIcon from '@mui/icons-material/FolderCopy';
 import { MenuType } from '@/@types/data';
 const Menu:MenuType = [
     {title: 'home', url: '/', Icon: HomeIcon},
@@ -13,5 +14,6 @@ const Menu:MenuType = [
         {title: "React Table", url: '/react-table'},
     ]},
     {title: 'States', url: '/zustand', Icon: AccountTreeIcon},
+    {title: 'File System', url: '/filesystem', Icon: FolderCopyIcon},
 ]
 export default Menu
