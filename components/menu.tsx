@@ -40,7 +40,7 @@ export default function MainMenu() {
             }}
           >
             {subMenu.map(({ url: subUrl, title: subTitle }) => (
-              <MenuItem onClick={()=>handleClose(url+subUrl)}>{subTitle}</MenuItem>
+              <MenuItem key={subTitle.replace(" ", "")} onClick={()=>handleClose(url+subUrl)}>{subTitle}</MenuItem>
             ))}
           </Menu>
         </>

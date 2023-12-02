@@ -34,10 +34,7 @@ type LocalModalType = {
 }
 
 export default function LocalModal({title, classes}: LocalModalType) {
-    const {open, text, toggle} = useModal()
-    useEffect(()=>{
-        console.log(text);
-    },[])
+    const {open, text, toggle} = useModal() 
   return (
     <Modal open={open} onClose={()=>toggle(false)}>
         <Box sx={{...style, ...classes}}>

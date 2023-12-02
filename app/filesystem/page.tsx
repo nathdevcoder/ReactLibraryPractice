@@ -17,17 +17,18 @@ export default function FileSystem() {
       <Stack direction="row">
         {directorys.map((dir) => (
           <List
+            key={Math.random().toString()}
             sx={{ width: "100%", maxWidth: 260, bgcolor: "background.paper" }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
               <ListSubheader component={Stack} direction='row' justifyContent='flex-end' >
-                  <IconButton  children={<PushPinOutlinedIcon/>} sx={{width: 'max-content'}} />  
+                  <IconButton sx={{width: 'max-content'}} ><PushPinOutlinedIcon/></IconButton>  
               </ListSubheader>
             }
           >
             {dir.map((FileItem) => (
-              <ListItem disablePadding>{FileItem}</ListItem>
+              <ListItem key={Math.random().toString()} disablePadding>{FileItem}</ListItem>
             ))}
           </List>
         ))}
