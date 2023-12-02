@@ -1,17 +1,23 @@
-type fileType = {
+type dirItemType = {
     name: string
     id: string
     index: number
+}
+
+type fileType = dirItemType & { 
     type: 'video' | 'image' | 'docs' | 'pdfs' | 'audio' | 'others'
 }
-type folderType = {
+type folderType = dirItemType & {   
+    type: 'locked' | 'public' | 'private' | 'hidden'
+}
+
+type directoryType = {
     files: fileType[]
     folders: folderType[]
     id: string
     name: string
     index: number
-    opened: folderType | null
+    opened: directoryType | null
     root: string | 'root'
 }
-
  

@@ -1,11 +1,17 @@
 'use client'
-import directories from "@/constant/directories";
+ 
 import { MapDirectories } from "@/utils/mapper";
-import { Box, List, ListItem, ListSubheader, Stack } from "@mui/material";
-import React from "react";
+import { Box, IconButton, List, ListItem, ListSubheader, Stack } from "@mui/material";
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
+import React from "react"; 
+import useFileSystemState from "@/hooks/useFileSystemState";
 
 export default function FileSystem() {
-  const directorys = MapDirectories(directories);
+  const {status, directories, fetchDir} = useFileSystemState()
+  if(status.loading) return <p>Loading..</p> 
+  if(status.error) return <p>{status.error}</p> 
+  if(!directories) return <p>No Data Found</p> 
+  const directorys = MapDirectories(directories, fetchDir);
   return (
     <Box>
       <Stack direction="row">
@@ -15,8 +21,8 @@ export default function FileSystem() {
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
-                Folder name
+              <ListSubheader component={Stack} direction='row' justifyContent='flex-end' >
+                  <IconButton  children={<PushPinOutlinedIcon/>} sx={{width: 'max-content'}} />  
               </ListSubheader>
             }
           >
