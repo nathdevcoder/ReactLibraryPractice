@@ -1,3 +1,5 @@
+import { createId } from "@/utils/Keeper";
+
 const directories: { [key: string]: directoryType } = {
   akfnr: {
     id: "akfnr",
@@ -12,7 +14,7 @@ const directories: { [key: string]: directoryType } = {
       { id: "img123", index: 2, name: "Images Folder", type: "public" },
     ],
     name: "root Folder",
-    root: "root",
+    root: ["root"],
     opened: null,
   },
   fd123: {
@@ -33,7 +35,7 @@ const directories: { [key: string]: directoryType } = {
       { id: "new123", index: 8, name: "folder new", type: "public" },
     ],
     opened: null,
-    root: "akfnr",
+    root: ["akfnr"],
     name: "Folder sample",
   },
   img123: {
@@ -48,7 +50,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: "akfnr",
+    root: ["akfnr"],
     name: "Images Folder",
   },
   vdo123: {
@@ -63,7 +65,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: "fd12",
+    root: ["fd12"],
     name: "Video Folder",
   },
   adu123: {
@@ -78,7 +80,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: "fd12",
+    root: ["fd12"],
     name: "Audio Folder",
   },
   dca123: {
@@ -93,7 +95,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: "fd12",
+    root: ["fd12"],
     name: "Documents Folder",
   },
   pdf123: {
@@ -108,7 +110,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: "fd12",
+    root: ["fd12"],
     name: "Pdfs Folder",
   },
   new123: {
@@ -117,11 +119,51 @@ const directories: { [key: string]: directoryType } = {
     files: [],
     folders: [],
     opened: null,
-    root: "fd12",
+    root: ["fd12"],
     name: "New Folder",
   },
 };
 
-export default function getDirectory(id: string): directoryType | undefined   {
+export function getDirectory(id: string): directoryType | undefined   {
   return directories[id]
+}
+export function deleteDirectory(id: string): boolean  {
+  try {
+    if(directories[id]) {
+      const folders = directories[id].folders
+      folders.forEach(fd=>{
+        const newRoot = directories[fd.id]?.root.filter(fl=> fl !== id)
+        const deletable = newRoot.length === 0
+        if(deletable) delete directories[fd.id]
+        else directories[fd.id].root = newRoot
+      })
+      delete directories[id]
+      return true
+    } else return false
+  } catch (error) {
+    return false
+  }
+}
+export function setDirectory(id: string, dir: directoryType): directoryType | undefined {
+  if(directories[id]) {
+    directories[id] = dir
+    return dir
+  } else return undefined 
+}
+export function addDirectory(root: string, name: string, index: number, type: folderTypeType): folderType | undefined {
+    if(!directories[root]) return undefined
+   const newid = createId()
+   const newDir: directoryType = {
+    files: [],
+    folders: [],
+    opened: null,
+    root: [root],
+    id: newid,
+    name,
+    index,
+   }
+   const newFolder = {id: newid, name, index, type}
+   directories[root].folders.push(newFolder)
+   directories[newid] = newDir 
+   return newFolder
 }

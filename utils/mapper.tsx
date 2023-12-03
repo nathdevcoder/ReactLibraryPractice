@@ -15,7 +15,7 @@ import FolderZipOutlinedIcon from '@mui/icons-material/FolderZipOutlined';
 import FolderSharedOutlinedIcon from '@mui/icons-material/FolderSharedOutlined';
 import SnippetFolderOutlinedIcon from '@mui/icons-material/SnippetFolderOutlined';
 export function MapDirectories(dirs: directoryType, fetcher: (id: string, root: string) => void) {
-  const components: ReactNode[][] = [];
+  const components: DirType<ReactNode> = [];
   Map(dirs) 
   function DirLists({ title, Icon, onClick }: { title: string; Icon: ReactNode, onClick: ()=>void }) {
     return (  
@@ -59,7 +59,9 @@ export function MapDirectories(dirs: directoryType, fetcher: (id: string, root: 
           )
         )
     })
-    components.push(component)
+    const {name, id} = data
+    const length = component.length
+    components.push({component, props: {name, id, length} })
     Map(data.opened)
   } 
   return components

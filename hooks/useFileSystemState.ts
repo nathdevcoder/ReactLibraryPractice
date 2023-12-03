@@ -1,5 +1,5 @@
-import { setDir } from "@/utils/setter";
-import axios from "axios";
+import { putFolder, setDir } from "@/utils/setter";
+import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 
 export default function useFileSystemState() {
@@ -13,27 +13,51 @@ export default function useFileSystemState() {
     fetchDir("akfnr");
   }, []);
 
-  async function fetchDir(id: string, root?: string) {
+  async function fetcher<T>({ Caller, Successor }:{
+    Caller: () => Promise<AxiosResponse<T>>
+    Successor: (data: T) => void
+  }) {
     try {
       setStatus({ loading: true, error: "" });
-      const { data, status } = await axios.get<directoryType | null>(
-        "api/directory?root=" + id
-      );
+      const { data, status } = await Caller()
       if (status === 200) {
         if (data) {
-          if(!root)setDirectories(data); 
-          else setDirectories(state => {
-            if(!state || !root) return data
-            else return setDir(state, root, data) 
-          })
+          Successor(data)
           setStatus({ loading: false, error: "" });
         } else {
           setStatus({ loading: false, error: "noData Found" });
         }
       } else throw Error("something went wrong");
-    } catch (error: any) {
+    } catch (error: any) { 
       setStatus({ loading: false, error: "Something went wrong" });
     }
   }
-  return { status, directories, fetchDir };
+
+  async function fetchDir(id: string, root?: string) {
+    await fetcher<directoryType | null>({
+      Caller: () => axios.get( "api/directory?root=" + id),
+      Successor: (data) => {
+        if(!root || !data)setDirectories(data); 
+        else setDirectories(state => {
+          if(!state || !root) return data
+          else return setDir(state, root, data) 
+        })
+      }
+    }) 
+  }
+  async function addDir(root: string, index: number) {
+    await fetcher({
+      Caller: () => axios.post<{data:folderType | null, message: string, success: boolean}>(
+        "api/directory",
+        {  root, index, name: 'new Folder', type: 'public' }
+      ),
+      Successor: ({data}) => {
+        setDirectories(state => {  
+          if(!state || !data) return state 
+          else return putFolder(state, root, data)
+        })
+      }
+    }) 
+  }
+  return { status, directories, fetchDir, addDir };
 }

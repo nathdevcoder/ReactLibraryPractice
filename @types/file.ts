@@ -3,12 +3,14 @@ type dirItemType = {
     id: string
     index: number
 }
+type folderTypeType = 'locked' | 'public' | 'private' | 'hidden'
+type fileTypeType = 'video' | 'image' | 'docs' | 'pdfs' | 'audio' | 'others'
 
 type fileType = dirItemType & { 
-    type: 'video' | 'image' | 'docs' | 'pdfs' | 'audio' | 'others'
+    type: fileTypeType
 }
 type folderType = dirItemType & {   
-    type: 'locked' | 'public' | 'private' | 'hidden'
+    type: folderTypeType
 }
 
 type directoryType = {
@@ -18,6 +20,8 @@ type directoryType = {
     name: string
     index: number
     opened: directoryType | null
-    root: string | 'root'
+    root: string[]
 }
  
+
+type DirType<t> = {component:t[], props: {id: string, name: string, length: number}}[]
