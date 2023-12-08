@@ -66,3 +66,33 @@ export function MapDirectories(dirs: directoryType, fetcher: (id: string, root: 
   } 
   return components
 }
+
+
+function DirLists({ title, Icon, onClick }: { title: string; Icon: ReactNode, onClick: ()=>void }) {
+  return (  
+  <ListItemButton onClick={onClick}>
+      <ListItemIcon>
+       {Icon}
+      </ListItemIcon>
+      <ListItemText primary={title} />
+  </ListItemButton> 
+  );
+} 
+ 
+
+
+  
+
+export function MapDirectory(dirs: directoryType) {
+  const items:  {dirItems:( fileType | folderType)[]; dir: directoryType}[]= [];
+  mapper(dirs)
+  function mapper(data: directoryType | null) {
+    if(!data) return
+    const item: (fileType | folderType)[] = [];
+    data.files.forEach(file=>item[file.index] = file)
+    data.folders.forEach(folder=>item[folder.index] = folder)
+    items.push({dirItems: item, dir: data})
+    mapper(data.opened)
+  }
+  return items
+}

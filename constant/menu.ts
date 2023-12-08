@@ -14,6 +14,9 @@ const Menu:MenuType = [
         {title: "React Table", url: '/react-table'},
     ]},
     {title: 'States', url: '/zustand', Icon: AccountTreeIcon},
-    {title: 'File System', url: '/filesystem', Icon: FolderCopyIcon},
+    {title: 'File System', url: '/filesystem', Icon: FolderCopyIcon, subMenu: [
+        {title: "File System", url: '/'}, 
+        {title: "MyFiles Headless", url: '/headless'}, 
+    ]},
 ]
 export default Menu

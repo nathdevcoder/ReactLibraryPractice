@@ -46,11 +46,8 @@ export default function useFileSystemState() {
     }) 
   }
   async function addDir(root: string, index: number) {
-    await fetcher({
-      Caller: () => axios.post<{data:folderType | null, message: string, success: boolean}>(
-        "api/directory",
-        {  root, index, name: 'new Folder', type: 'public' }
-      ),
+    await fetcher<{data:folderType | null, message: string, success: boolean}>({
+      Caller: () => axios.post("api/directory", {  root, index, name: 'new Folder', type: 'public' } ),
       Successor: ({data}) => {
         setDirectories(state => {  
           if(!state || !data) return state 
