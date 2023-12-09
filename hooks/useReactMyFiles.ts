@@ -19,6 +19,7 @@ const initial: directoryType = {
 export default function useReactMyFiles({ endpoint, rootID }: paramType) {
   const { Query, Mutate, status } = useFetcher();
   const [rootDir, setRootDir] = useState(initial);
+  const [holding, setHolding] = useState<{id: string, type: 'copy' | 'cut' | 'stale'}>({id: '', type: 'stale'})
 
   useEffect(() => {
     if (endpoint)
@@ -122,7 +123,18 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       onDelete() {
         deleteFolder(dir.id, item.id)
       },
-      selected: dir.opened?.id === item.id
+      onHold(type: 'copy' | 'cut') {
+        const opened = dir.opened && dir.opened.id == item.id
+        if(opened) setDir(dir.id, (dir) => {
+          dir.opened = null
+        })
+        setHolding({id: item.id, type})
+      },
+      onPaste() {
+        setHolding({id:'', type: 'stale'})
+      },
+      selected: dir.opened?.id === item.id,
+      disable: item.id === holding.id
     }
   }
   function getFileProps(dir: directoryType, item: fileType | folderType) {
@@ -136,7 +148,14 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       onDelete( ) {
         console.log('name');
       },
-      selected: false
+      onHold(type: 'copy' | 'cut') {
+        console.log(type);
+      },
+      onPaste() {
+        console.log('name'); 
+      },
+      selected: false,
+      disable: false
     }
   }
 

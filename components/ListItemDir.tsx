@@ -1,6 +1,9 @@
  
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ContentCut from '@mui/icons-material/ContentCut';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import ContentPaste from '@mui/icons-material/ContentPaste';
 import {
   Input,
   Button,
@@ -24,9 +27,11 @@ type listitemdirType = {
   onRename: (name: string) => void
   onDelete: () => void
   selected: boolean
+  disable: boolean
+  onHold: (type: 'copy' | 'cut') => void
 };
 
-export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , selected}: listitemdirType) {
+export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , selected, disable, onHold}: listitemdirType) {
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(title)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -48,7 +53,7 @@ export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , 
 
   return (
     <ListItem sx={{ p: 0 }}>
-      <ListItemButton onDoubleClick={onOpen} selected={selected} onContextMenu={onRightClickHandler}>
+      <ListItemButton onDoubleClick={onOpen} selected={selected} onContextMenu={onRightClickHandler} disabled={disable}>
         <ListItemIcon>{Icon}</ListItemIcon> 
         {renaming ? 
         <Input 
@@ -80,6 +85,18 @@ export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , 
             <DeleteOutlineIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
+        </MenuItem> 
+        <MenuItem onClick={()=> {onHold('copy');setAnchorEl(null)}}>
+          <ListItemIcon>
+            <ContentCopy  fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Copy</ListItemText>
+        </MenuItem> 
+        <MenuItem onClick={()=> {onHold('cut');setAnchorEl(null)}}>
+          <ListItemIcon>
+            <ContentCut  fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Cut</ListItemText>
         </MenuItem> 
       </Menu>
       <Dialog 
