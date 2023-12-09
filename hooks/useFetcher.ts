@@ -28,18 +28,28 @@ export default function useFetcher() {
         }
       }
 
-      async function Get<T>(url: string, onSuccess: (data: T) => void, params?: any) {
+      async function Query<T>(url: string, onSuccess: (data: T) => void, params?: any) {
         await fetcher<T>({
           Caller: () => axios.get(url, {params: params}),
           Successor: onSuccess
         }) 
       }
-      async function Post<T, P>(url: string, onSuccess: (data:T) => void, payload?: P) {
+      async function Mutate<T>(
+        type: "POST" | "PUT" | "PATCH" | "DELETE" = 'POST', 
+        url: string, 
+        onSuccess: (data:T) => void, 
+        payload?: any
+        ) {
         await fetcher<T>({
-          Caller: () => axios.post(url, payload),
+          Caller: () => {
+            if(type === 'DELETE') return axios.delete(url, payload)
+            if(type === 'PATCH') return axios.patch(url, payload)
+            if(type === 'PUT') return axios.put(url, payload)
+            return axios.post(url, payload)
+          },
           Successor:  onSuccess
         }) 
       }
     
-  return {fetcher, status, Get, Post, }
+  return {fetcher, status, Mutate, Query }
 }

@@ -3,8 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.scss'
 import ThemeRegistry from '@/providers/ThemeProvider' 
 import ApiProvider from '@/providers/ApiProvider'
-import { AppBar, Box, Container,  Toolbar,   Typography } from '@mui/material' 
-import Menu from '@/components/menu'
+import { AppBar, Box, Container,  Toolbar,   Typography } from '@mui/material'  
+import MenuContainer from '@/components/menuContainer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,7 +29,7 @@ export default function RootLayout({
             <AppBar position="static">
               <Toolbar variant="dense">
                 <Container maxWidth='xl'>
-                   <Menu />
+                   <MenuContainer />
                 </Container> 
               </Toolbar>
             </AppBar>

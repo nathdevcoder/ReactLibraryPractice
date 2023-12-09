@@ -11,4 +11,6 @@ export type MenuType = {
         title: string
         url: string
     }[]
-}[]
+} 
+
+export type MenuListType = MenuType[]

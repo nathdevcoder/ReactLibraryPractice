@@ -25,14 +25,10 @@ import SnippetFolderOutlinedIcon from "@mui/icons-material/SnippetFolderOutlined
 import React, { ReactNode } from "react";
 
 export default function MyFilesHeadless() { 
-  const myFiles = useReactMyFiles({
+  const {status, directories, openFolder, addFolder, renameFolder} = useReactMyFiles({
     endpoint: '/api/directory',
     rootID: 'akfnr' 
   });
-
-  if(myFiles.type !== 'apied') return null
-  const {status, directories, openFolder, addFolder} = myFiles
-  
 
   function DirLists({ title, Icon, onClick, }: { title: string; Icon: ReactNode; onClick: () => void; }) {
     return (

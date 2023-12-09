@@ -1,12 +1,14 @@
 "use client";
-import menu from "@/constant/menu";
+import { MenuType } from "@/@types/data"; 
 import { Tooltip, IconButton, Menu, MenuItem, Button } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-export default function MainMenu() {
-  const {push} = useRouter() 
+ 
+
+export default function MainMenu({ title, url, Icon, subMenu }: MenuType) {
+  const router = useRouter() 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -14,9 +16,9 @@ export default function MainMenu() {
   };
   const handleClose = (url:string) => {
     setAnchorEl(null);
-    push(url)
+    router.push(url)
   };
-  return menu.map(({ title, url, Icon, subMenu }) => {
+  
     if (subMenu) {
       return (
         <>
@@ -31,7 +33,7 @@ export default function MainMenu() {
             </Button>
           </Tooltip>
           <Menu
-            id="basic-menu"
+            id={title.replace(" ", "")}
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
@@ -60,5 +62,5 @@ export default function MainMenu() {
         </IconButton>
       </Tooltip>
     );
-  });
+   
 }

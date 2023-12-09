@@ -1,29 +1,9 @@
 import { useEffect, useState } from "react";
 import useFetcher from "./useFetcher";
 
-type hookType = {
-      openDir: (dir: directoryType, root: string) => void;
-      addDir: (root: string, folder: folderType) => void;
-      setDir: (dir?: directoryType) => void;
-      directories: {
-        dirItems: (fileType | folderType)[];
-        dir: directoryType;
-      }[];
-      type: 'normal'
-    } | {
-      directories: {
-        dirItems: (fileType | folderType)[];
-        dir: directoryType;
-      }[];
-      addFolder: (root: string, index: number) => Promise<void>;
-      openFolder: (folderID: string, rootID: string) => Promise<void>;
-      status: { loading: boolean; error: string };
-      type: 'apied'
-    };
 type paramType = {
-  root?: directoryType;
-  endpoint?: string;
-  rootID?: string;
+  endpoint: string;
+  rootID: string;
 };
 
 const initial: directoryType = {
@@ -36,19 +16,17 @@ const initial: directoryType = {
   index: -1,
 };
 
-export default function useReactMyFiles({ root, endpoint, rootID }: paramType): hookType {
-  const { Post, Get, status } = useFetcher();
-  const [rootDir, setRootDir] = useState(root || initial);
+export default function useReactMyFiles({ endpoint, rootID }: paramType) {
+  const { Query, Mutate, status } = useFetcher();
+  const [rootDir, setRootDir] = useState(initial);
 
   useEffect(() => {
     if (endpoint)
-      Get<directoryType>(endpoint, (data) => setDir(data), { root: rootID });
+      Query<directoryType>(endpoint, (data) => initializeDir(data), { root: rootID });
   }, []);
-
-  const directories = MapDirectory(rootDir);
+ 
   function MapDirectory(dirs: directoryType) {
-    const items: { dirItems: (fileType | folderType)[]; dir: directoryType }[] =
-      [];
+    const items: { dirItems: (fileType | folderType)[]; dir: directoryType }[] = [];
     mapper(dirs);
     function mapper(data: directoryType | null) {
       if (!data) return;
@@ -61,13 +39,13 @@ export default function useReactMyFiles({ root, endpoint, rootID }: paramType): 
     return items;
   }
 
-  function setDir(dir?: directoryType) {
+  function initializeDir(dir?: directoryType) {
     if (dir) setRootDir(dir);
   }
 
   function openDir(dir: directoryType, root: string) {
     setRootDir((state) => {
-      const setTo = _setDir(state, root, dir);
+      const setTo = _openDir(state, root, dir);
       if (!state || !root || !setTo) return dir;
       else return setTo;
     });
@@ -79,14 +57,21 @@ export default function useReactMyFiles({ root, endpoint, rootID }: paramType): 
       else return toSet;
     });
   }
-  function _setDir(
+  function setDir(root: string, set: (dir:directoryType)=>void) {
+    setRootDir((state) => {
+      const toSet = _setDir(state, root, set);
+      if (!state || !toSet) return state;
+      else return toSet;
+    });
+  }
+  function _openDir(
     stateDir: directoryType | null,
     id: string,
     dir: directoryType
   ): directoryType | null {
     if (stateDir === null) return stateDir;
     if (stateDir.id == id) stateDir.opened = dir;
-    else _setDir(stateDir.opened, id, dir);
+    else _openDir(stateDir.opened, id, dir);
     return stateDir;
   }
   function _putFolder(
@@ -99,38 +84,42 @@ export default function useReactMyFiles({ root, endpoint, rootID }: paramType): 
     else _putFolder(stateDir.opened, id, folder);
     return stateDir;
   }
-
-  if (endpoint) {
-    const apied: {
-      addFolder: (root: string, index: number) => Promise<void>;
-      openFolder: (folderID: string, rootID: string) => Promise<void>;
-      status: { loading: boolean; error: string };
-    } = {
-      addFolder: async (root: string, index: number) => {
-        await Post<
-          { data: folderType | null; message: string; success: boolean },
-          any
-        >(
-          endpoint,
-          (data) => {
-            if (data.data) addDir(root, data.data);
-          },
-          { root, index, name: "new Folder", type: "public" }
-        );
-      },
-      openFolder: async (folderID: string, rootID: string) => {
-        await Get<directoryType | null>(
-          endpoint,
-          (data) => {
-            if (data) openDir(data, rootID);
-          },
-          { root: folderID }
-        );
-      },
-      status: status,
-    };
-    return { directories, ...apied, type: 'apied' };
-  } else {
-    return { directories, openDir, addDir, setDir, type: 'normal' };
+  function _setDir(
+    stateDir: directoryType | null,
+    id: string,
+    set: (dir:directoryType) => void
+    ): directoryType | null {
+      if (stateDir === null) return stateDir;
+      if (stateDir.id == id) set(stateDir) 
+      else _setDir(stateDir.opened, id, set)
+      return stateDir
   }
+
+  const directories = MapDirectory(rootDir);
+
+  const addFolder = async (root: string, index: number) => {
+    await Mutate< { data: folderType | null; message: string; success: boolean } > ( 
+      "POST", endpoint, (data) => { 
+        if (data.data) addDir(root, data.data) 
+      },{ root, index, name: "new Folder", type: "public" }
+    );
+  };
+
+  const openFolder = async (folderID: string, rootID: string) => {
+    await Query<directoryType | null>(
+      endpoint, (data) => {
+        if (data) openDir(data, rootID);
+      }, { root: folderID }
+    );
+  };
+
+  const renameFolder =  async (rootID: string, name: string) => {
+    await Mutate<responceType<directoryType>>(
+      "PATCH", endpoint, (data) => {
+        if(data.success) setDir(rootID, (dir) => dir.name=name)
+      }, { root:  rootID, name }
+    );
+  }
+
+  return { directories, openFolder, addFolder, status, renameFolder };
 }

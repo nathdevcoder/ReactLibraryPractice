@@ -4,8 +4,8 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import AccountTreeIcon from '@mui/icons-material/AccountTree'; 
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
-import { MenuType } from '@/@types/data';
-const Menu:MenuType = [
+import { MenuListType } from '@/@types/data';
+const Menu:MenuListType = [
     {title: 'home', url: '/', Icon: HomeIcon},
     {title: 'Forms', url: '/forms', Icon: DynamicFormIcon},
     {title: 'Fetchs', url: '/fetch', Icon: ApiIcon},
