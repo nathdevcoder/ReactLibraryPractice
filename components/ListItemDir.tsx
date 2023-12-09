@@ -2,7 +2,11 @@
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
-    Input,
+  Input,
+  Button,
+  Dialog,
+  DialogActions, 
+  DialogTitle,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -18,12 +22,14 @@ type listitemdirType = {
   Icon: React.ReactNode;
   onOpen: () => void; 
   onRename: (name: string) => void
+  onDelete: () => void
 };
 
-export default function ListItemDir({ title, Icon, onOpen, onRename }: listitemdirType) {
+export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete }: listitemdirType) {
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(title)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [alert, setAlert] = useState(false)
   const open = Boolean(anchorEl);
   const inputref = useRef() as MutableRefObject<HTMLInputElement>;
  
@@ -68,13 +74,27 @@ export default function ListItemDir({ title, Icon, onOpen, onRename }: listitemd
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={()=> {setAlert(true);setAnchorEl(null)}}>
           <ListItemIcon>
             <DeleteOutlineIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem> 
       </Menu>
+      <Dialog 
+        open={alert}
+        onClose={()=> setAlert(false)}
+        aria-labelledby="alert-dialog-title" 
+      >
+        <DialogTitle id="alert-dialog-title">are you want to delete this</DialogTitle> 
+        <DialogActions>
+          <Button onClick={()=>setAlert(false)}>cancel</Button>
+          <Button onClick={()=>{
+            onDelete()
+            setAlert(false)
+          }} autoFocus>Delete</Button>
+        </DialogActions>
+      </Dialog>
     </ListItem>
   );
 }

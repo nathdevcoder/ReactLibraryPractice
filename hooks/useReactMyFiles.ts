@@ -10,7 +10,7 @@ const initial: directoryType = {
   opened: null,
   files: [],
   folders: [],
-  root: [],
+  root: '',
   id: "",
   name: "loading",
   index: -1,
@@ -43,46 +43,12 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     if (dir) setRootDir(dir);
   }
 
-  function openDir(dir: directoryType, root: string) {
-    setRootDir((state) => {
-      const setTo = _openDir(state, root, dir);
-      if (!state || !root || !setTo) return dir;
-      else return setTo;
-    });
-  }
-  function addDir(root: string, folder: folderType) {
-    setRootDir((state) => {
-      const toSet = _putFolder(state, root, folder);
-      if (!state || !folder || !toSet) return state;
-      else return toSet;
-    });
-  }
   function setDir(root: string, set: (dir:directoryType)=>void) {
     setRootDir((state) => {
       const toSet = _setDir(state, root, set);
       if (!state || !toSet) return state;
       else return toSet;
     });
-  }
-  function _openDir(
-    stateDir: directoryType | null,
-    id: string,
-    dir: directoryType
-  ): directoryType | null {
-    if (stateDir === null) return stateDir;
-    if (stateDir.id == id) stateDir.opened = dir;
-    else _openDir(stateDir.opened, id, dir);
-    return stateDir;
-  }
-  function _putFolder(
-    stateDir: directoryType | null,
-    id: string,
-    folder: folderType
-  ): directoryType | null {
-    if (stateDir === null) return stateDir;
-    if (stateDir.id == id) stateDir.folders.push(folder);
-    else _putFolder(stateDir.opened, id, folder);
-    return stateDir;
   }
   function _setDir(
     stateDir: directoryType | null,
@@ -100,15 +66,21 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
   const addFolder = async (root: string, index: number) => {
     await Mutate< { data: folderType | null; message: string; success: boolean } > ( 
       "POST", endpoint, (data) => { 
-        if (data.data) addDir(root, data.data) 
+        if(!data.success) return
+        const folder = data.data
+        if (folder) setDir(root, (dir) => { 
+          dir.folders.push(folder)
+        })  
       },{ root, index, name: "new Folder", type: "public" }
     );
   };
 
   const openFolder = async (folderID: string, rootID: string) => {
     await Query<directoryType | null>(
-      endpoint, (data) => {
-        if (data) openDir(data, rootID);
+      endpoint, (data) => { 
+        if(data) setDir(rootID, (dir)=> {
+          dir.opened = data
+        })
       }, { root: folderID }
     );
   };
@@ -116,9 +88,24 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
   const renameFolder =  async (rootID: string, name: string) => {
     await Mutate<responceType<directoryType>>(
       "PATCH", endpoint, (data) => {
-        if(data.success) setDir(rootID, (dir) => dir.name=name)
+        if(data.success) setDir(rootID, (dir) => {
+          dir.name = name
+        })
       }, { root:  rootID, name, type: 'Rename' }
     );
+  }
+
+  const deleteFolder = async (rootID: string, id: string) => {
+    await Mutate<responceType<string>>(
+      "DELETE", endpoint+'?id='+id, (data) => {
+        if(data.success) setDir(rootID, (dir) => {
+          dir.folders = dir.folders.filter(ft=>ft.id !== id)
+          if(dir.opened?.id === id) {
+            dir.opened = null
+          }
+        })
+      }
+    )
   }
 
   function getFolderProps(dir: directoryType, item: fileType | folderType) {
@@ -129,6 +116,9 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       },
       onRename(name: string) {
         renameFolder(item.id, name)
+      },
+      onDelete() {
+        deleteFolder(dir.id, item.id)
       }
     }
   }
@@ -138,7 +128,10 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
         console.log('clist');
       },
       onRename(name: string) {
-        renameFolder(dir.id, name)
+        console.log(name);
+      },
+      onDelete( ) {
+        console.log('name');
       }
     }
   }

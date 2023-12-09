@@ -11,7 +11,7 @@ const directories = {
       {id: 'fd1', index: 2, name: 'folder2', type: 'public', dir: 'folder'},
     ], 
     name: 'root Folder',
-    root: ["root"],
+    root: "root",
     opened: {
       id: '2',
       index: 1,
@@ -30,7 +30,7 @@ const directories = {
         {id: '2fd9', index: 8, name: 'folder8', type: 'public', dir: 'folder'},
       ], 
       opened: null,
-      root: ['1'],
+      root: '1',
       name: 'folder 1'
     }
 } as directoryType

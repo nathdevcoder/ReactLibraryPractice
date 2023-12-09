@@ -14,7 +14,7 @@ const directories: { [key: string]: directoryType } = {
       { id: "img123", index: 2, name: "Images Folder", type: "public", dir: 'folder' },
     ],
     name: "root Folder",
-    root: ["root"],
+    root: "root",
     opened: null,
   },
   fd123: {
@@ -35,7 +35,7 @@ const directories: { [key: string]: directoryType } = {
       { id: "new123", index: 8, name: "folder new", type: "public", dir: 'folder' },
     ],
     opened: null,
-    root: ["akfnr"],
+    root: "akfnr",
     name: "Folder sample",
   },
   img123: {
@@ -50,7 +50,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["akfnr"],
+    root: "akfnr",
     name: "Images Folder",
   },
   vdo123: {
@@ -65,7 +65,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd123"],
+    root: "fd123",
     name: "Video Folder",
   },
   adu123: {
@@ -80,7 +80,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd123"],
+    root: "fd123",
     name: "Audio Folder",
   },
   dca123: {
@@ -95,7 +95,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd123"],
+    root: "fd123",
     name: "Documents Folder",
   },
   pdf123: {
@@ -110,7 +110,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd123"],
+    root: "fd123",
     name: "Pdfs Folder",
   },
   new123: {
@@ -119,7 +119,7 @@ const directories: { [key: string]: directoryType } = {
     files: [],
     folders: [],
     opened: null,
-    root: ["fd123"],
+    root: "fd123",
     name: "New Folder",
   },
 };
@@ -129,20 +129,23 @@ export function getDirectory(id: string): directoryType | undefined   {
 }
 export function deleteDirectory(id: string): boolean  {
   try {
-    if(directories[id]) {
-      const folders = directories[id].folders
-      folders.forEach(fd=>{
-        const newRoot = directories[fd.id]?.root.filter(fl=> fl !== id)
-        const deletable = newRoot.length === 0
-        if(deletable) delete directories[fd.id]
-        else directories[fd.id].root = newRoot
-      })
-      delete directories[id]
-      return true
-    } else return false
+     _delDir(id)
+     return true
   } catch (error) {
     return false
   }
+}
+function _delDir(id: string) {
+  if(directories[id]) {
+    const {folders, root } = directories[id] 
+    if(directories[root]) {
+      directories[root].folders = directories[root].folders.filter(fl=> fl.id !== id) 
+    }  
+    folders.forEach(fd=>{ 
+      _delDir(fd.id)
+    })
+    delete directories[id]   
+  }  
 }
 export function setDirectory(id: string, dir: directoryType): directoryType | undefined {
   if(directories[id]) {
@@ -151,13 +154,13 @@ export function setDirectory(id: string, dir: directoryType): directoryType | un
   } else return undefined 
 }
 export function addDirectory(root: string, name: string, index: number, type: folderTypeType): folderType | undefined {
-    if(!directories[root]) return undefined
+   if(!directories[root]) return undefined
    const newid = createId()
    const newDir: directoryType = {
     files: [],
     folders: [],
     opened: null,
-    root: [root],
+    root: root,
     id: newid,
     name,
     index,
@@ -173,13 +176,11 @@ export function renameFolder(root: string, name: string) {
     const dir = directories[root]
     if(dir) {
       dir.name = name
-      dir.root.forEach(fd=>{
-        const rootdir = directories[fd]
-        if(rootdir) {
-          const folder = rootdir.folders.find(fn=> fn.id === root)
-          if(folder) folder.name = name
-        }
-      })
+      const rootdir = directories[dir.root]
+      if(rootdir) {
+        const folder = rootdir.folders.find(fn=> fn.id === root)
+        if(folder) folder.name = name
+      } 
     }
     return true
   } catch (error) {

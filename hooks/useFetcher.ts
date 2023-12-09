@@ -41,7 +41,7 @@ export default function useFetcher() {
         ) {
         await fetcher<T>({
           Caller: () => {
-            if(type === 'DELETE') return axios.delete(url, payload)
+            if(type === 'DELETE') return axios.delete(url)
             if(type === 'PATCH') return axios.patch(url, payload)
             if(type === 'PUT') return axios.put(url, payload)
             return axios.post(url, payload)

@@ -69,7 +69,7 @@ export default function MyFilesHeadless() {
             })}
           </List>
         ))}
-      </Stack>
+      </Stack> 
     </Box>
   )
 }

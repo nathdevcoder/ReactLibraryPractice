@@ -31,10 +31,11 @@ export async function PATCH(request: NextRequest) {
   return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
 }
 
-export async function DELETE(request: NextRequest) {
-  const { id } = await request.json() as {id: string}
+export async function DELETE(request: NextRequest) { 
+  const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get('id')
   if(!id) return NextResponse.json({success: false, message: 'unsuficient data required'});
   const success = deleteDirectory(id)
-  if(success) return NextResponse.json({success: true, message: 'folder deleted'});
-  NextResponse.json({success: false, message: 'failed to delete'});
+  if(success) return NextResponse.json({data: null, success: true, message: 'folder deleted'});
+  return NextResponse.json({data: null, success: false, message: 'failed to delete'});
 }

@@ -22,7 +22,7 @@ type directoryType = {
     name: string
     index: number
     opened: directoryType | null
-    root: string[]
+    root: string
 }
 
 type FileComponentType = Record<fileTypeType, (fl:fileType)=>React.ReactNode>
