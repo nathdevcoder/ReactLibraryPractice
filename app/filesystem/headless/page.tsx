@@ -3,9 +3,7 @@ import useReactMyFiles from "@/hooks/useReactMyFiles";
 import {
   Box,
   IconButton,
-  List,
-  ListItemButton,
-  ListItemIcon,
+  List, 
   ListItemText,
   ListSubheader,
   Stack,
@@ -22,22 +20,15 @@ import FolderIcon from "@mui/icons-material/Folder";
 import FolderZipOutlinedIcon from "@mui/icons-material/FolderZipOutlined";
 import FolderSharedOutlinedIcon from "@mui/icons-material/FolderSharedOutlined";
 import SnippetFolderOutlinedIcon from "@mui/icons-material/SnippetFolderOutlined";
-import React, { ReactNode } from "react";
+import React  from "react";
+import ListItemDir from "@/components/ListItemDir";
 
 export default function MyFilesHeadless() { 
-  const {status, directories, openFolder, addFolder, renameFolder} = useReactMyFiles({
+  const {status, directories, getFileProps, addFolder, getFolderProps} = useReactMyFiles({
     endpoint: '/api/directory',
     rootID: 'akfnr' 
-  });
-
-  function DirLists({ title, Icon, onClick, }: { title: string; Icon: ReactNode; onClick: () => void; }) {
-    return (
-      <ListItemButton onClick={onClick}>
-        <ListItemIcon>{Icon}</ListItemIcon>
-        <ListItemText primary={title} />
-      </ListItemButton>
-    );
-  } 
+  }); 
+ 
   if (status.loading && !directories) return <p>Loading..</p>;
   if (status.error) return <p>{status.error}</p>;
   if (!directories) return <p>No Data Found</p>;
@@ -62,18 +53,18 @@ export default function MyFilesHeadless() {
           >
             {dirItems.map((item) => {
                 if(item.dir === 'file') {
-                    if(item.type === 'video') return  <DirLists key={item.id} title={item.name} Icon={<VideoFileIcon color="error" />} onClick={()=> {} } />
-                    if(item.type === 'image') return   <DirLists key={item.id} title={item.name} Icon={<PhotoIcon color='success' />} onClick={()=> {} } />
-                    if(item.type === 'audio') return  <DirLists key={item.id} title={item.name} Icon={<AudioFileIcon sx={{color: 'violet'}}  />} onClick={()=> {} } />
-                    if(item.type === 'docs') return  <DirLists key={item.id} title={item.name} Icon={<ArticleIcon color="info" />} onClick={()=> {} } />
-                    if(item.type === 'pdfs') return  <DirLists key={item.id} title={item.name} Icon={<PictureAsPdfIcon color='secondary'  />} onClick={()=> {} } />
-                    return <DirLists key={item.id} title={item.name} Icon={<InsertDriveFileIcon />} onClick={()=> {} } />
+                    if(item.type === 'video') return  <ListItemDir key={item.id} title={item.name} Icon={<VideoFileIcon color="error" />} {...getFileProps(dir,item)} />
+                    if(item.type === 'image') return   <ListItemDir key={item.id} title={item.name} Icon={<PhotoIcon color='success' />} {...getFileProps(dir,item)} />
+                    if(item.type === 'audio') return  <ListItemDir key={item.id} title={item.name} Icon={<AudioFileIcon sx={{color: 'violet'}}  />} {...getFileProps(dir,item)} />
+                    if(item.type === 'docs') return  <ListItemDir key={item.id} title={item.name} Icon={<ArticleIcon color="info" />} {...getFileProps(dir,item)} />
+                    if(item.type === 'pdfs') return  <ListItemDir key={item.id} title={item.name} Icon={<PictureAsPdfIcon color='secondary'  />} {...getFileProps(dir,item)} />
+                    return <ListItemDir key={item.id} title={item.name} Icon={<InsertDriveFileIcon />} {...getFileProps(dir,item)} />
                 } 
                 if(item.dir === 'folder') {
-                    if(item.type === 'hidden') return <DirLists key={item.id} title={item.name} Icon={<FolderSharedOutlinedIcon color='warning' />}  onClick={()=> openFolder(item.id, dir.id) } />
-                    if(item.type === 'locked') return <DirLists key={item.id} title={item.name} Icon={<SnippetFolderOutlinedIcon color='warning' />}  onClick={()=> openFolder(item.id, dir.id) } />
-                    if(item.type === 'private') return <DirLists key={item.id} title={item.name} Icon={<FolderZipOutlinedIcon  color='warning' />}  onClick={()=> openFolder(item.id, dir.id) } />
-                    return <DirLists key={item.id} title={item.name} Icon={<FolderIcon  color='warning' />}  onClick={()=> openFolder(item.id, dir.id) } />
+                    if(item.type === 'hidden') return <ListItemDir key={item.id} title={item.name} Icon={<FolderSharedOutlinedIcon color='warning' />}  {...getFolderProps(dir, item)} />
+                    if(item.type === 'locked') return <ListItemDir key={item.id} title={item.name} Icon={<SnippetFolderOutlinedIcon color='warning' />}  {...getFolderProps(dir, item)}/>
+                    if(item.type === 'private') return <ListItemDir key={item.id} title={item.name} Icon={<FolderZipOutlinedIcon  color='warning' />}  {...getFolderProps(dir, item)} />
+                    return <ListItemDir key={item.id} title={item.name} Icon={<FolderIcon  color='warning' />}  {...getFolderProps(dir, item)}  />
                 }
             })}
           </List>

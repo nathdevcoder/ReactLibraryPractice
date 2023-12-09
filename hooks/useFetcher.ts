@@ -22,8 +22,7 @@ export default function useFetcher() {
             }
           } else throw Error("something went wrong");
         } catch (error: any) { 
-            console.log(error);
-            
+            console.log(error); 
           setStatus({ loading: false, error: "Something went wrong" });
         }
       }

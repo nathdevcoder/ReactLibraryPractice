@@ -117,9 +117,31 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     await Mutate<responceType<directoryType>>(
       "PATCH", endpoint, (data) => {
         if(data.success) setDir(rootID, (dir) => dir.name=name)
-      }, { root:  rootID, name }
+      }, { root:  rootID, name, type: 'Rename' }
     );
   }
 
-  return { directories, openFolder, addFolder, status, renameFolder };
+  function getFolderProps(dir: directoryType, item: fileType | folderType) {
+    return {
+      onOpen() {
+        const opened = dir.opened && dir.opened.id == item.id
+        if(!opened) openFolder(item.id, dir.id) 
+      },
+      onRename(name: string) {
+        renameFolder(item.id, name)
+      }
+    }
+  }
+  function getFileProps(dir: directoryType, item: fileType | folderType) {
+    return {
+      onOpen() {
+        console.log('clist');
+      },
+      onRename(name: string) {
+        renameFolder(dir.id, name)
+      }
+    }
+  }
+
+  return { directories, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps };
 }

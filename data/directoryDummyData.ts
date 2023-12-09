@@ -65,7 +65,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd12"],
+    root: ["fd123"],
     name: "Video Folder",
   },
   adu123: {
@@ -80,7 +80,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd12"],
+    root: ["fd123"],
     name: "Audio Folder",
   },
   dca123: {
@@ -95,7 +95,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd12"],
+    root: ["fd123"],
     name: "Documents Folder",
   },
   pdf123: {
@@ -110,7 +110,7 @@ const directories: { [key: string]: directoryType } = {
     ],
     folders: [],
     opened: null,
-    root: ["fd12"],
+    root: ["fd123"],
     name: "Pdfs Folder",
   },
   new123: {
@@ -119,7 +119,7 @@ const directories: { [key: string]: directoryType } = {
     files: [],
     folders: [],
     opened: null,
-    root: ["fd12"],
+    root: ["fd123"],
     name: "New Folder",
   },
 };
@@ -166,4 +166,23 @@ export function addDirectory(root: string, name: string, index: number, type: fo
    directories[root].folders.push(newFolder)
    directories[newid] = newDir 
    return newFolder
+}
+
+export function renameFolder(root: string, name: string) {
+  try {
+    const dir = directories[root]
+    if(dir) {
+      dir.name = name
+      dir.root.forEach(fd=>{
+        const rootdir = directories[fd]
+        if(rootdir) {
+          const folder = rootdir.folders.find(fn=> fn.id === root)
+          if(folder) folder.name = name
+        }
+      })
+    }
+    return true
+  } catch (error) {
+    return false
+  }
 }

@@ -1,5 +1,5 @@
  
-import { addDirectory, deleteDirectory, getDirectory } from "@/data/directoryDummyData";
+import { addDirectory, deleteDirectory, getDirectory, renameFolder } from "@/data/directoryDummyData";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest):Promise<NextResponse<directoryType | null>> { 
@@ -21,8 +21,14 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({data, success: true, message: 'folder added'});
 }
 
-export async function PUT(request: NextRequest) {
-  return NextResponse.json(true);
+export async function PATCH(request: NextRequest) {
+  const  {root, name, type} = await request.json() as {root: string, name: string, type: "Rename"}
+  if(!root) return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
+  if(type === 'Rename') {
+    const renamed = renameFolder(root, name)
+    return NextResponse.json({data: null, success: renamed, message: renamed ? 'folder renamed' : 'something went wrong'});
+  }
+  return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
 }
 
 export async function DELETE(request: NextRequest) {
