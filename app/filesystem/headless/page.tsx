@@ -2,13 +2,17 @@
 import useReactMyFiles from "@/hooks/useReactMyFiles";
 import {
   Box,
+  Breadcrumbs,
   IconButton,
   List, 
+  ListItemIcon, 
   ListItemText,
   ListSubheader,
+  Menu,
+  MenuItem,
   Stack,
+  Typography,
 } from "@mui/material";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import PhotoIcon from "@mui/icons-material/Photo";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
@@ -24,7 +28,9 @@ import React  from "react";
 import ListItemDir from "@/components/ListItemDir";
 
 export default function MyFilesHeadless() { 
-  const {status, directories, getFileProps, addFolder, getFolderProps} = useReactMyFiles({
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const {status, directories, breadcrumbs, getFileProps, addFolder, getFolderProps} = useReactMyFiles({
     endpoint: '/api/directory',
     rootID: 'akfnr' 
   }); 
@@ -34,22 +40,30 @@ export default function MyFilesHeadless() {
   if (!directories) return <p>No Data Found</p>;
   return (
     <Box>
+      <Breadcrumbs aria-label="breadcrumb"> 
+       {breadcrumbs.map(bread=> <Typography key={bread.replace(" ", "")} >{bread}</Typography>)}
+      </Breadcrumbs>
       <Stack direction="row">
         {directories.map(({dir, dirItems }) => (
           <List
             key={dir.id}
-            sx={{ width: "100%", maxWidth: 260, bgcolor: "background.paper" }}
+            sx={{ width: "100%", maxWidth: 260, bgcolor: "background.paper", pb: 8, px: 2, borderRight: '1px solid rgba(150, 150, 150, 0.1)' }}
             component="nav"
             aria-labelledby="nested-list-subheader"
             subheader={
               <ListSubheader component={Stack} direction='row' justifyContent='flex-end' >
-                  <ListItemText>{dir.name}</ListItemText>
+                  {/* <ListItemText>{dir.name}</ListItemText> */}
                   <Box>
-                    <IconButton sx={{width: 'max-content'}} ><PushPinOutlinedIcon/></IconButton>  
+                    {/* <IconButton sx={{width: 'max-content'}} ><PushPinOutlinedIcon/></IconButton>   */}
                     <IconButton sx={{width: 'max-content'}} onClick={()=>addFolder(dir.id, dirItems.length)} ><CreateNewFolderIcon/></IconButton>  
                   </Box>
               </ListSubheader>
             }
+            onContextMenu={(e) =>{
+              e.preventDefault();
+              e.stopPropagation();
+              setAnchorEl(e.currentTarget);
+            } }
           >
             {dirItems.map((item) => {
                 if(item.dir === 'file') {
@@ -67,6 +81,27 @@ export default function MyFilesHeadless() {
                     return <ListItemDir key={item.id} title={item.name} Icon={<FolderIcon  color='warning' />}  {...getFolderProps(dir, item)}  />
                 }
             })}
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={()=>setAnchorEl(null)}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }} 
+              onContextMenu={e=>e.preventDefault()} 
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+            >
+              <MenuItem onClick={()=>addFolder(dir.id, dirItems.length)}>
+                <ListItemIcon>
+                  <CreateNewFolderIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Add Folder</ListItemText>
+              </MenuItem> 
+            </Menu>
           </List>
         ))}
       </Stack> 

@@ -23,9 +23,10 @@ type listitemdirType = {
   onOpen: () => void; 
   onRename: (name: string) => void
   onDelete: () => void
+  selected: boolean
 };
 
-export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete }: listitemdirType) {
+export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , selected}: listitemdirType) {
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(title)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -47,7 +48,7 @@ export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete }:
 
   return (
     <ListItem sx={{ p: 0 }}>
-      <ListItemButton onDoubleClick={onOpen} onContextMenu={onRightClickHandler}>
+      <ListItemButton onDoubleClick={onOpen} selected={selected} onContextMenu={onRightClickHandler}>
         <ListItemIcon>{Icon}</ListItemIcon> 
         {renaming ? 
         <Input 

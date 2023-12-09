@@ -27,6 +27,7 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
  
   function MapDirectory(dirs: directoryType) {
     const items: { dirItems: (fileType | folderType)[]; dir: directoryType }[] = [];
+    const bread: string [] = []
     mapper(dirs);
     function mapper(data: directoryType | null) {
       if (!data) return;
@@ -34,9 +35,10 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       data.files.forEach((file) => (item[file.index] = file));
       data.folders.forEach((folder) => (item[folder.index] = folder));
       items.push({ dirItems: item, dir: data });
+      bread.push(data.name)
       mapper(data.opened);
     }
-    return items;
+    return {directories:items, breadcrumbs: bread};
   }
 
   function initializeDir(dir?: directoryType) {
@@ -61,7 +63,7 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       return stateDir
   }
 
-  const directories = MapDirectory(rootDir);
+  const { directories, breadcrumbs} = MapDirectory(rootDir);
 
   const addFolder = async (root: string, index: number) => {
     await Mutate< { data: folderType | null; message: string; success: boolean } > ( 
@@ -119,7 +121,8 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       },
       onDelete() {
         deleteFolder(dir.id, item.id)
-      }
+      },
+      selected: dir.opened?.id === item.id
     }
   }
   function getFileProps(dir: directoryType, item: fileType | folderType) {
@@ -132,9 +135,10 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       },
       onDelete( ) {
         console.log('name');
-      }
+      },
+      selected: false
     }
   }
 
-  return { directories, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps };
+  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps };
 }
