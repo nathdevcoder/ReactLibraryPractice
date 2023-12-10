@@ -5,7 +5,7 @@ import React  from "react";
 import ListDirectory from "@/components/ListDirectory";
 
 export default function MyFilesHeadless() { 
-  const {status, directories, breadcrumbs, getFileProps, getFolderProps, getActionProps} = useReactMyFiles({
+  const {status, directories, breadcrumbs, getItemProps, getActionProps} = useReactMyFiles({
     endpoint: '/api/directory',
     rootID: 'akfnr' 
   });  
@@ -22,10 +22,7 @@ export default function MyFilesHeadless() {
         {directories.map(({dir, dirItems, length }) => (
           <ListDirectory 
             key={dir.id}
-            ItemProps={ (dirItm: dirTypes ) => ({
-              fileProps: getFileProps(dir, dirItm),
-              folderProps: getFolderProps(dir, dirItm)
-            })}  
+            getItemProps={(Item:dirTypes) => getItemProps(dir, Item)}  
             dirItems={dirItems}
             actionProps={getActionProps(dir, length)}
           />

@@ -111,56 +111,58 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     )
   }
 
-  function getFolderProps(dir: directoryType, item: fileType | folderType) {
-    return {
-      onOpen() {
-        const opened = dir.opened && dir.opened.id == item.id
-        if(!opened) openFolder(item.id, dir.id) 
-      },
-      onRename(name: string) {
-        renameFolder(item.id, name)
-      },
-      onDelete() {
-        deleteFolder(dir.id, item.id)
-      },
-      onHold(type: 'copy' | 'cut') {
-        const opened = dir.opened && dir.opened.id == item.id
-        if(opened) setDir(dir.id, (dir) => {
-          dir.opened = null
-        })
-        setHolding({id: item.id, root: dir.id, type})
-      },
-      onPaste() {
-        if(!holding.id || !holding.root || holding.root === dir.id) return
-        setHolding({id:'',root: '', type: 'stale'})
-      },
-      selected: dir.opened?.id === item.id,
-      disable: item.id === holding.id,
-      isHolding: Boolean(holding.id)
+  function getItemProps(dir: directoryType, item: fileType | folderType): dirItemProps {
+    if(item.dir === 'folder') {
+      return {
+        onOpen() {
+          const opened = dir.opened && dir.opened.id == item.id
+          if(!opened) openFolder(item.id, dir.id) 
+        },
+        onRename(name: string) {
+          renameFolder(item.id, name)
+        },
+        onDelete() {
+          deleteFolder(dir.id, item.id)
+        },
+        onHold(type: 'copy' | 'cut') {
+          const opened = dir.opened && dir.opened.id == item.id
+          if(opened) setDir(dir.id, (dir) => {
+            dir.opened = null
+          })
+          setHolding({id: item.id, root: dir.id, type})
+        },
+        onPaste() {
+          if(!holding.id || !holding.root || holding.root === dir.id) return
+          setHolding({id:'',root: '', type: 'stale'})
+        },
+        selected: dir.opened?.id === item.id,
+        disable: item.id === holding.id,
+        isHolding: Boolean(holding.id)
+      }
+    } else {
+      return {
+        onOpen() {
+          console.log('clist');
+        },
+        onRename(name: string) {
+          console.log(name);
+        },
+        onDelete( ) {
+          console.log('name');
+        },
+        onHold(type: 'copy' | 'cut') {
+          console.log(type);
+        },
+        onPaste() {
+          console.log('name'); 
+        },
+        selected: false,
+        disable: false,
+        isHolding: false
+      }
     }
   }
-  function getFileProps(dir: directoryType, item: fileType | folderType) {
-    return {
-      onOpen() {
-        console.log('clist');
-      },
-      onRename(name: string) {
-        console.log(name);
-      },
-      onDelete( ) {
-        console.log('name');
-      },
-      onHold(type: 'copy' | 'cut') {
-        console.log(type);
-      },
-      onPaste() {
-        console.log('name'); 
-      },
-      selected: false,
-      disable: false,
-      isHolding: false
-    }
-  }
+ 
 
   function getActionProps(dir: directoryType, length: number) {
     return {
@@ -175,5 +177,5 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     }
   }
 
-  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps, getActionProps  };
+  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getItemProps, getActionProps  };
 }

@@ -23,15 +23,12 @@ import ListActionDir from "./ListActionDir";
 
 
 type ListDirsType = {
-    ItemProps: (dirItems: dirTypes) => ({
-        fileProps:dirItemProps
-        folderProps:dirItemProps
-    }) 
+    getItemProps: (item: dirTypes) => dirItemProps 
     dirItems: dirTypes[]
     actionProps: dirActionProps
 }
 
-export default function ListDirectory({ItemProps, dirItems, actionProps}: ListDirsType) {
+export default function ListDirectory({getItemProps, dirItems, actionProps}: ListDirsType) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); 
 
   return (
@@ -43,20 +40,20 @@ export default function ListDirectory({ItemProps, dirItems, actionProps}: ListDi
         onContextMenu={(e) =>{ e.preventDefault();e.stopPropagation();setAnchorEl(e.currentTarget);}}
     >
         {dirItems.map((item) => {
-            const {fileProps, folderProps} = ItemProps(item)
+            const itemProps = getItemProps(item)
             if(item.dir === 'file') {
-                if(item.type === 'video') return  <ListItemDir key={item.id} title={item.name} Icon={<VideoFileIcon color="error" />} {...fileProps} />
-                if(item.type === 'image') return   <ListItemDir key={item.id} title={item.name} Icon={<PhotoIcon color='success' />} {...fileProps} />
-                if(item.type === 'audio') return  <ListItemDir key={item.id} title={item.name} Icon={<AudioFileIcon sx={{color: 'violet'}}  />} {...fileProps} />
-                if(item.type === 'docs') return  <ListItemDir key={item.id} title={item.name} Icon={<ArticleIcon color="info" />} {...fileProps} />
-                if(item.type === 'pdfs') return  <ListItemDir key={item.id} title={item.name} Icon={<PictureAsPdfIcon color='secondary'  />} {...fileProps} />
-                return <ListItemDir key={item.id} title={item.name} Icon={<InsertDriveFileIcon />} {...fileProps} />
+                if(item.type === 'video') return  <ListItemDir key={item.id} title={item.name} Icon={<VideoFileIcon color="error" />} {...itemProps} />
+                if(item.type === 'image') return   <ListItemDir key={item.id} title={item.name} Icon={<PhotoIcon color='success' />} {...itemProps} />
+                if(item.type === 'audio') return  <ListItemDir key={item.id} title={item.name} Icon={<AudioFileIcon sx={{color: 'violet'}}  />} {...itemProps} />
+                if(item.type === 'docs') return  <ListItemDir key={item.id} title={item.name} Icon={<ArticleIcon color="info" />} {...itemProps} />
+                if(item.type === 'pdfs') return  <ListItemDir key={item.id} title={item.name} Icon={<PictureAsPdfIcon color='secondary'  />} {...itemProps} />
+                return <ListItemDir key={item.id} title={item.name} Icon={<InsertDriveFileIcon />} {...itemProps} />
             }
-            if(item.dir === 'folder') {
-                if(item.type === 'hidden') return <ListItemDir key={item.id} title={item.name} Icon={<FolderSharedOutlinedIcon color='warning' />}  {...folderProps} />
-                if(item.type === 'locked') return <ListItemDir key={item.id} title={item.name} Icon={<SnippetFolderOutlinedIcon color='warning' />}  {...folderProps}/>
-                if(item.type === 'private') return <ListItemDir key={item.id} title={item.name} Icon={<FolderZipOutlinedIcon  color='warning' />}  {...folderProps} />
-                return <ListItemDir key={item.id} title={item.name} Icon={<FolderIcon  color='warning' />}  {...folderProps}  />
+            if(item.dir === 'folder') { 
+                if(item.type === 'hidden') return <ListItemDir key={item.id} title={item.name} Icon={<FolderSharedOutlinedIcon color='warning' />}  {...itemProps} />
+                if(item.type === 'locked') return <ListItemDir key={item.id} title={item.name} Icon={<SnippetFolderOutlinedIcon color='warning' />}  {...itemProps}/>
+                if(item.type === 'private') return <ListItemDir key={item.id} title={item.name} Icon={<FolderZipOutlinedIcon  color='warning' />}  {...itemProps} />
+                return <ListItemDir key={item.id} title={item.name} Icon={<FolderIcon  color='warning' />}  {...itemProps}  />
             }
         })}
         <ListContextActionDir anchorEl={anchorEl} onClose={()=>setAnchorEl(null)} {...actionProps} />
