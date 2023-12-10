@@ -19,7 +19,7 @@ const initial: directoryType = {
 export default function useReactMyFiles({ endpoint, rootID }: paramType) {
   const { Query, Mutate, status } = useFetcher();
   const [rootDir, setRootDir] = useState(initial);
-  const [holding, setHolding] = useState<{id: string, type: 'copy' | 'cut' | 'stale'}>({id: '', type: 'stale'})
+  const [holding, setHolding] = useState<{id: string, root: string, type: 'copy' | 'cut' | 'stale'}>({id: '', root: '', type: 'stale'})
 
   useEffect(() => {
     if (endpoint)
@@ -27,7 +27,7 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
   }, []);
  
   function MapDirectory(dirs: directoryType) {
-    const items: { dirItems: (fileType | folderType)[]; dir: directoryType }[] = [];
+    const items: { dirItems: (fileType | folderType)[]; dir: directoryType, length: number }[] = [];
     const bread: string [] = []
     mapper(dirs);
     function mapper(data: directoryType | null) {
@@ -35,7 +35,7 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
       const item: (fileType | folderType)[] = [];
       data.files.forEach((file) => (item[file.index] = file));
       data.folders.forEach((folder) => (item[folder.index] = folder));
-      items.push({ dirItems: item, dir: data });
+      items.push({ dirItems: item, dir: data, length: item.length });
       bread.push(data.name)
       mapper(data.opened);
     }
@@ -128,13 +128,15 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
         if(opened) setDir(dir.id, (dir) => {
           dir.opened = null
         })
-        setHolding({id: item.id, type})
+        setHolding({id: item.id, root: dir.id, type})
       },
       onPaste() {
-        setHolding({id:'', type: 'stale'})
+        if(!holding.id || !holding.root || holding.root === dir.id) return
+        setHolding({id:'',root: '', type: 'stale'})
       },
       selected: dir.opened?.id === item.id,
-      disable: item.id === holding.id
+      disable: item.id === holding.id,
+      isHolding: Boolean(holding.id)
     }
   }
   function getFileProps(dir: directoryType, item: fileType | folderType) {
@@ -155,9 +157,23 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
         console.log('name'); 
       },
       selected: false,
-      disable: false
+      disable: false,
+      isHolding: false
     }
   }
 
-  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps };
+  function getActionProps(dir: directoryType, length: number) {
+    return {
+      isHolding: Boolean(holding.id),
+      onAddFolder() {
+        addFolder(dir.id, length)
+      },
+      onPaste() {
+        if(!holding.id || !holding.root || holding.root === dir.id) return
+        setHolding({id:'',root: '', type: 'stale'})
+      },
+    }
+  }
+
+  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getFolderProps, getFileProps, getActionProps  };
 }

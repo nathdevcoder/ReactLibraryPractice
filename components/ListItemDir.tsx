@@ -23,15 +23,9 @@ import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 type listitemdirType = {
   title: string;
   Icon: React.ReactNode;
-  onOpen: () => void; 
-  onRename: (name: string) => void
-  onDelete: () => void
-  selected: boolean
-  disable: boolean
-  onHold: (type: 'copy' | 'cut') => void
-};
+} & dirItemProps
 
-export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , selected, disable, onHold}: listitemdirType) {
+export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , selected, disable, isHolding, onHold, onPaste}: listitemdirType) {
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(title)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -98,6 +92,14 @@ export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , 
           </ListItemIcon>
           <ListItemText>Cut</ListItemText>
         </MenuItem> 
+        {isHolding && (
+          <MenuItem onClick={onPaste}>
+           <ListItemIcon>
+             <ContentPaste  fontSize="small" />
+           </ListItemIcon>
+           <ListItemText>Paste</ListItemText>
+         </MenuItem> 
+        )}
       </Menu>
       <Dialog 
         open={alert}

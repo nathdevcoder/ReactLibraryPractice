@@ -29,3 +29,20 @@ type FileComponentType = Record<fileTypeType, (fl:fileType)=>React.ReactNode>
 type folderComponentType = Record<folderTypeType, (fl:folderType)=>React.ReactNode>
 
 type DirType<t> = {component:t[], props: {id: string, name: string, length: number}}[]
+
+type dirItemProps = {
+    onOpen(): void;
+    onRename(name: string): void;
+    onDelete(): void;
+    onHold(type: "copy" | "cut"): void;
+    onPaste(): void;
+    selected: boolean;
+    disable: boolean;
+    isHolding: boolean;
+}
+type dirTypes = folderType | fileType
+type dirActionProps = {
+    isHolding: boolean;
+    onAddFolder(): void;
+    onPaste(): void;
+}
