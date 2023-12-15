@@ -93,7 +93,12 @@ export default function ListItemDir({ title, Icon, onOpen, onRename, onDelete , 
           <ListItemText>Cut</ListItemText>
         </MenuItem> 
         {isHolding && (
-          <MenuItem onClick={onPaste}>
+          <MenuItem onClick={(e)=>{
+            e.stopPropagation()
+            console.log(e);
+            
+            onPaste()
+          }}>
            <ListItemIcon>
              <ContentPaste  fontSize="small" />
            </ListItemIcon>

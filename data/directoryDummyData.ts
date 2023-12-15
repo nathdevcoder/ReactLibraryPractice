@@ -187,3 +187,51 @@ export function renameFolder(root: string, name: string) {
     return false
   }
 }
+
+export function copyPasteFolder(newRoot: string, copiedId:string, length: number) {
+  try { 
+    const copyDir = directories[copiedId]
+    const newRootDir = directories[newRoot] 
+    if(copyDir && newRootDir) {
+      const newId = createId()
+      directories[newId] = {
+        ...copyDir,
+        index: length,
+        root: newRoot,
+      }
+      newRootDir.folders.push({
+        id: newId, 
+        name: copyDir.name, 
+        type: 'public', 
+        dir: 'folder',
+        index: length, 
+      })
+      return {id: newId, name: copyDir.name}
+    } else return null
+  } catch (error) {  
+    return null
+  }
+}
+
+export function cutPasteFolder(newRoot: string, cutId:string, length: number) {
+  try {
+    const cutDir = directories[cutId]
+    const newRootDir = directories[newRoot]
+    const lastRoot = cutDir.root
+    const lastRootDir = directories[lastRoot]
+    if(cutDir && newRootDir && lastRootDir) { 
+      lastRootDir.folders = lastRootDir.folders.filter(fd=>fd.id !== cutId)
+      newRootDir.folders.push({
+        id: cutId, 
+        name: cutDir.name, 
+        type: 'public', 
+        dir: 'folder',
+        index: length, 
+      })
+      cutDir.root = newRoot
+      return {id: cutDir.id, name: cutDir.name}
+    } else return null
+  } catch (error) {
+    return null
+  }
+}

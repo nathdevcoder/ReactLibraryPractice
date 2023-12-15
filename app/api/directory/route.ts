@@ -1,5 +1,5 @@
  
-import { addDirectory, deleteDirectory, getDirectory, renameFolder } from "@/data/directoryDummyData";
+import { addDirectory, copyPasteFolder, cutPasteFolder, deleteDirectory, getDirectory, renameFolder } from "@/data/directoryDummyData";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest):Promise<NextResponse<directoryType | null>> { 
@@ -27,6 +27,19 @@ export async function PATCH(request: NextRequest) {
   if(type === 'Rename') {
     const renamed = renameFolder(root, name)
     return NextResponse.json({data: null, success: renamed, message: renamed ? 'folder renamed' : 'something went wrong'});
+  }
+  return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
+}
+export async function PUT(request: NextRequest) {
+  const  { newRoot, copiedId, type, index } = await request.json() as {newRoot: string, copiedId: string, type: 'copy' | 'cut' | 'move', index: number }
+  if(!newRoot || !copiedId || !type || index == undefined) return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
+  if(type === 'copy') { 
+    const result = copyPasteFolder(newRoot, copiedId, index)
+    if(result) return NextResponse.json({data: result, success: true, message: 'copied folder'});
+  } 
+  if(type === 'cut') {
+    const result = cutPasteFolder(newRoot, copiedId, index)
+    if(result) return NextResponse.json({data: result, success: true, message: 'copied folder'});
   }
   return NextResponse.json({data: null, success: false, message: 'unsuficient data required'});
 }

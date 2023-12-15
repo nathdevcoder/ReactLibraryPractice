@@ -22,7 +22,7 @@ export default function MyFilesHeadless() {
         {directories.map(({dir, dirItems, length }) => (
           <ListDirectory 
             key={dir.id}
-            getItemProps={(Item:dirTypes) => getItemProps(dir, Item)}  
+            getItemProps={(Item:dirTypes) => getItemProps(dir, Item, length)}  
             dirItems={dirItems}
             actionProps={getActionProps(dir, length)}
           />

@@ -46,11 +46,14 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     if (dir) setRootDir(dir);
   }
 
-  function setDir(root: string, set: (dir:directoryType)=>void) {
-    setRootDir((state) => {
-      const toSet = _setDir(state, root, set);
-      if (!state || !toSet) return state;
-      else return toSet;
+  function setDir(root: string, sets: ((dir:directoryType)=>void) | ((dir:directoryType)=>void)[]) {
+    setRootDir((state) => { 
+      if(sets instanceof Array) {
+        const roots = root.split(':')
+        sets.forEach((set, i) => _setDir(state, roots[i], set))
+      } else _setDir(state, root, sets);
+      if (!state) return state;
+      else return state;
     });
   }
   function _setDir(
@@ -111,7 +114,41 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     )
   }
 
-  function getItemProps(dir: directoryType, item: fileType | folderType): dirItemProps {
+  const reSpaceFolder = async (newRoot: string, lastRoot: string, copiedId: string, type: "cut" | "copy" | 'move', index: number) => {
+    await Mutate<responceType<{id: string, name: string}| null>>(
+      "PUT", endpoint, (data) => {
+        const {success, data: result} = data 
+        if(success && result ) { 
+          setDir( `${newRoot}:${lastRoot}:${copiedId}`, [
+            (dir) => { 
+              if( type !== 'move') {
+                dir.folders.push({
+                  id: result.id, 
+                  index, 
+                  type: 'public', 
+                  dir: 'folder', 
+                  name: result.name
+                })
+              }
+            }, 
+            (dir) => {
+              if(type === 'cut') dir.folders = dir.folders.filter(fd=> fd.id !== copiedId)
+            }, 
+            (dir) => {
+              if(type === 'cut') {
+                dir.id = result.id
+                dir.root = newRoot
+                console.log(dir); 
+              }
+            }
+          ])
+          setHolding({id:'',root: '', type: 'stale'})
+        }
+      }, { newRoot, copiedId, type, index }
+    )
+  }
+
+  function getItemProps(dir: directoryType, item: fileType | folderType, length: number): dirItemProps {
     if(item.dir === 'folder') {
       return {
         onOpen() {
@@ -125,15 +162,15 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
           deleteFolder(dir.id, item.id)
         },
         onHold(type: 'copy' | 'cut') {
-          const opened = dir.opened && dir.opened.id == item.id
+          const opened = dir.opened && dir.opened.id == item.id && type === 'cut'
           if(opened) setDir(dir.id, (dir) => {
             dir.opened = null
           })
           setHolding({id: item.id, root: dir.id, type})
         },
-        onPaste() {
-          if(!holding.id || !holding.root || holding.root === dir.id) return
-          setHolding({id:'',root: '', type: 'stale'})
+        onPaste() { 
+          if(!holding.id || !holding.root || holding.root === dir.id || holding.type === 'stale') return 
+          reSpaceFolder(dir.id, holding.root, holding.id, holding.type, length)
         },
         selected: dir.opened?.id === item.id,
         disable: item.id === holding.id,
@@ -171,8 +208,8 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
         addFolder(dir.id, length)
       },
       onPaste() {
-        if(!holding.id || !holding.root || holding.root === dir.id) return
-        setHolding({id:'',root: '', type: 'stale'})
+        if(!holding.id || !holding.root || holding.root === dir.id || holding.type === 'stale') return
+        reSpaceFolder(dir.id, holding.root, holding.id, holding.type, length)
       },
     }
   }

@@ -32,7 +32,10 @@ export default function ListContextActionDir({onAddFolder, isHolding, anchorEl, 
       <ListItemText>Add Folder</ListItemText>
     </MenuItem> 
     {isHolding && (
-      <MenuItem onClick={onPaste}>
+      <MenuItem onClick={(e)=>{
+        e.stopPropagation()
+        onPaste()
+      }}>
         <ListItemIcon>
           <ContentPaste  fontSize="small" />
         </ListItemIcon>
