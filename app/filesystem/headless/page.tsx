@@ -1,10 +1,12 @@
 'use client' 
 import useReactMyFiles from "@/hooks/useReactMyFiles";
-import { Box,  Breadcrumbs, Stack, Typography, } from "@mui/material"; 
+import { Box,  Breadcrumbs, Button, Stack, Typography, } from "@mui/material"; 
 import React  from "react"; 
 import ListDirectory from "@/components/ListDirectory";
+import LocalDrawer, { useDrawer } from "@/components/drawer";
 
 export default function MyFilesHeadless() { 
+  const {toggleDrawer} = useDrawer()
   const {status, directories, breadcrumbs, getItemProps, getActionProps} = useReactMyFiles({
     endpoint: '/api/directory',
     rootID: 'akfnr' 
@@ -28,6 +30,8 @@ export default function MyFilesHeadless() {
           />
         ))}
       </Stack> 
+        <Button onClick={()=>toggleDrawer(true)}>Check data on server</Button>
+      <LocalDrawer />
     </Box>
   )
 }

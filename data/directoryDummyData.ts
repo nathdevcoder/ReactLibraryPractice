@@ -187,30 +187,43 @@ export function renameFolder(root: string, name: string) {
     return false
   }
 }
-
+ 
 export function copyPasteFolder(newRoot: string, copiedId:string, length: number) {
-  try { 
-    const copyDir = directories[copiedId]
-    const newRootDir = directories[newRoot] 
-    if(copyDir && newRootDir) {
-      const newId = createId()
-      directories[newId] = {
-        ...copyDir,
-        index: length,
-        root: newRoot,
-      }
-      newRootDir.folders.push({
-        id: newId, 
-        name: copyDir.name, 
-        type: 'public', 
-        dir: 'folder',
-        index: length, 
+  let mutation = 0
+  const dirs: directoryType[] = []
+  const newDirID = createId()
+  const copiedDir = directories[copiedId]
+  const rootDir = directories[newRoot]
+  if(!copiedDir && !rootDir) return null
+  copiedDir.index = length
+  rootDir.folders.push({
+    id: newDirID,
+    index: length,
+    name: copiedDir.name, 
+    type: 'public', 
+    dir: 'folder',
+  })
+  _copyFolder(copiedDir, newDirID, newRoot)
+  function _copyFolder(dir: directoryType, newId: string, newRoot: string) { 
+    if(mutation > 100) return
+    mutation++
+    dirs.push({
+      ...dir,
+      id: newId,
+      root: newRoot,
+      folders: dir.folders.map(fd=> {
+        const newForderId = createId()
+        const oldFolderId = fd.id
+        const originalDir = directories[oldFolderId]
+        if(originalDir)_copyFolder(originalDir, newForderId, newId)
+        return {...fd, id: newForderId}
       })
-      return {id: newId, name: copyDir.name}
-    } else return null
-  } catch (error) {  
-    return null
+    }) 
   }
+  dirs.forEach(dir=>{
+    directories[dir.id] = dir
+  })
+  return {id: newDirID, name: copiedDir.name}
 }
 
 export function cutPasteFolder(newRoot: string, cutId:string, length: number) {
@@ -234,4 +247,8 @@ export function cutPasteFolder(newRoot: string, cutId:string, length: number) {
   } catch (error) {
     return null
   }
+}
+
+export default function getDirectories(): directoryType[] { 
+  return Object.entries(directories).map(d=>d[1])
 }

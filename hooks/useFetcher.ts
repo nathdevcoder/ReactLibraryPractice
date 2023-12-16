@@ -1,7 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
 import  { useState } from 'react'
+import { useQueryClient } from 'react-query';
 
 export default function useFetcher() {
+  const clientQ = useQueryClient()
     const [status, setStatus] = useState<{ loading: boolean; error: string }>({
         loading: false,
         error: "",
@@ -46,7 +48,10 @@ export default function useFetcher() {
             if(type === 'PUT') return axios.put(url, payload)
             return axios.post(url, payload)
           },
-          Successor:  onSuccess
+          Successor:  (d)=> {
+            onSuccess(d)
+            clientQ.invalidateQueries('getFolders')
+          }
         }) 
       }
     
