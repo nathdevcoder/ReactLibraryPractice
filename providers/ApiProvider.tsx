@@ -1,19 +1,23 @@
 
 'use client'
 import axios from 'axios'
+import { Session } from 'next-auth'
+import { SessionProvider } from 'next-auth/react'
 import {QueryClient, QueryClientProvider} from 'react-query'
 
 
 const queryclient = new QueryClient()
 
-export default function ApiProvider({children}: {children: React.ReactNode}) {
+export default function ApiProvider({children, session}: {children: React.ReactNode, session: Session | null}) {
     axios.interceptors.request.use(congig=> {
         congig.headers.Authorization = 'bearer Sometoken'
         return congig
     })
     return (
-        <QueryClientProvider client={queryclient}>
-            {children}
-        </QueryClientProvider>
+        <SessionProvider session={session}>
+            <QueryClientProvider client={queryclient}>
+                {children}
+            </QueryClientProvider>
+        </SessionProvider>
     )
 }

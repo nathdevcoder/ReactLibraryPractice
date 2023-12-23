@@ -5,6 +5,8 @@ import ThemeRegistry from '@/providers/ThemeProvider'
 import ApiProvider from '@/providers/ApiProvider'
 import { AppBar, Box, Container,  Toolbar,   Typography } from '@mui/material'  
 import MenuContainer from '@/components/menuContainer'
+import { getServerSession } from 'next-auth'
+import { authOptions } from './api/auth/[...nextauth]/route'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,15 +16,15 @@ export const metadata: Metadata = {
 }
 
  
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  
+  const session = await getServerSession(authOptions)
   return (
     <html lang="en">
-      <ApiProvider>
+      <ApiProvider session={session}>
         <ThemeRegistry options={{ key: 'mui' }}> 
           <body className={inter.className}> 
             <Typography variant='h2' my={2} textAlign={'center'}>React Library Practice</Typography>

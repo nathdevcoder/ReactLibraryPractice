@@ -220,6 +220,7 @@ export function copyPasteFolder(newRoot: string, copiedId:string, length: number
       })
     }) 
   }
+  if(mutation >= 100) return null
   dirs.forEach(dir=>{
     directories[dir.id] = dir
   })

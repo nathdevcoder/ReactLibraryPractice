@@ -214,5 +214,5 @@ export default function useReactMyFiles({ endpoint, rootID }: paramType) {
     }
   }
 
-  return { directories, breadcrumbs, openFolder, addFolder, status, renameFolder, getItemProps, getActionProps  };
+  return { directories, breadcrumbs, status,  getItemProps, getActionProps  };
 }
