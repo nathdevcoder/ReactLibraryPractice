@@ -1,4 +1,4 @@
-import { LogIn } from "@/data/credentialsData";
+import { LogIn, UpdateRole } from "@/data/credentialsData";
 import { AuthOptions } from "next-auth";
 import NextAuth from "next-auth/next"; 
 import CredentialsProvider from "next-auth/providers/credentials"
@@ -9,25 +9,28 @@ export const authOptions: AuthOptions = {
             name: 'credentials',
             credentials: {
                 name: {label: 'username', placeholder: 'enter username'},
-                password: {label: 'password', placeholder: 'enter password'}
+                password: {label: 'password', placeholder: 'enter password'},
+                role: {label: 'role', placeholder: 'role'}
             },
-            async authorize(credentials) {
-                if(!credentials || !credentials.name || !credentials.password) return null 
-                return LogIn(credentials.name, credentials.password)
+            async authorize(credentials) { 
+                if(!credentials || !credentials.name || !credentials.password || !credentials.role) return null 
+                return LogIn(credentials.name, credentials.password, credentials.role as roleType)
             }
         })
     ],
     secret: 'secteadsaqw',
     callbacks:  {
+        async signIn({credentials, user}) {  
+            if(!credentials || !credentials.role  || !user.id) return false 
+            return UpdateRole(user.id, credentials.role as any) 
+        },
         async jwt({token, user}) { 
-            if(user) {
+            if(user) { 
                 return {
                     ...token,
-                    id: user.id,
-                    address: 'adress',
-                    name: user.name,
+                    ...user
                 }
-            } 
+            }  
             return token
         },
         async session({session,token}) {  
@@ -35,8 +38,7 @@ export const authOptions: AuthOptions = {
                 ...session,
                 user: {
                     ...session.user,
-                    id: token.id,
-                    address: token.address
+                    ...token
                 }
             } 
         },

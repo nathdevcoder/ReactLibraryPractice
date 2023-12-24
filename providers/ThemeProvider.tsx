@@ -10,6 +10,7 @@ import {
   responsiveFontSizes,
 } from "@mui/material/styles";
 import React from "react";
+import { SnackbarProvider } from "notistack";
 
 type ThemeProviderType = {
   children: React.ReactNode;
@@ -91,7 +92,9 @@ export default function ThemeRegistry(props: ThemeProviderType) {
     <CacheProvider value={cache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {children}
+        <SnackbarProvider>
+          {children}
+        </SnackbarProvider>
       </ThemeProvider>
     </CacheProvider>
   );

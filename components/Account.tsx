@@ -1,6 +1,6 @@
 'use client'
 import React, { Fragment } from 'react'
-import { Button, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
+import { Button, Chip, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { signOut, useSession } from 'next-auth/react';
 import { Logout, PersonAdd, Login } from '@mui/icons-material';
@@ -31,9 +31,10 @@ export default function Account() {
     }
   return (
     <Fragment>
-        <Button startIcon={<AccountCircleIcon />} size='large' onClick={handleClick} disabled={anchorEl.loading} endIcon={'admin'}>
-            {session? 'nath ': 'Guest'}
+        <Button startIcon={<AccountCircleIcon />} size='large' onClick={handleClick} disabled={anchorEl.loading} sx={{mr: 2}} >
+            {session? 'Hi Nathaniel': 'Guest'}
         </Button>
+        <Chip label="Admin" variant='outlined' color='info'  />
         <Menu
         anchorEl={anchorEl.el}
         id="account-menu"
