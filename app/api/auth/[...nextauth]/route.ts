@@ -24,7 +24,17 @@ export const authOptions: AuthOptions = {
             if(!credentials || !credentials.role  || !user.id) return false 
             return UpdateRole(user.id, credentials.role as any) 
         },
-        async jwt({token, user}) { 
+        async jwt({token, user, trigger, session}) {  
+            if(trigger === 'update' && session?.role && token?.id) {  
+                const success = UpdateRole(token.id as string, session.role)  
+                if(success)  {
+                    return {
+                        ...token, 
+                        role: session.role,
+                    }
+                }
+                return token
+            }
             if(user) { 
                 return {
                     ...token,
