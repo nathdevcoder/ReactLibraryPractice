@@ -6,7 +6,7 @@ import ApiProvider from '@/providers/ApiProvider'
 import { AppBar, Box, Container, Toolbar,   Typography } from '@mui/material'  
 import MenuContainer from '@/components/menuContainer'
 import { getServerSession } from 'next-auth'
-import { authOptions } from './api/auth/[...nextauth]/route'
+import authOptions  from '@/utils/AuthOptions'
 import Account from '@/components/Account'
 import GlobalModals from '@/components/GlobalModals'
 
