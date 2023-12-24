@@ -3,10 +3,12 @@ import { Inter } from 'next/font/google'
 import './globals.scss'
 import ThemeRegistry from '@/providers/ThemeProvider' 
 import ApiProvider from '@/providers/ApiProvider'
-import { AppBar, Box, Container,  Toolbar,   Typography } from '@mui/material'  
+import { AppBar, Box, Container, Toolbar,   Typography } from '@mui/material'  
 import MenuContainer from '@/components/menuContainer'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './api/auth/[...nextauth]/route'
+import Account from '@/components/Account'
+import GlobalModals from '@/components/GlobalModals'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,10 +38,14 @@ export default async function RootLayout({
               </Toolbar>
             </AppBar>
             <Container maxWidth='lg'>
+              <Box  my={2} textAlign={'right'}>
+                <Account />
+              </Box>
               <Box my={4}>
                 {children}
               </Box>
             </Container>
+            <GlobalModals />
           </body>
         </ThemeRegistry>
       </ApiProvider>

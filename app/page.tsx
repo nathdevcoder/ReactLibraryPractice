@@ -6,9 +6,7 @@ import { useSession } from "next-auth/react"
  
 
 export default function Home() {
-   const {data} = useSession()
-   console.log(data);
-   
+   const {data} = useSession() 
   return (
     <main>
       <h1>hello world</h1> 
