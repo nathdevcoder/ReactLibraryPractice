@@ -1,5 +1,5 @@
 'use client'
-import { Box, Dialog, DialogTitle, Modal, Paper, PaperProps, SxProps, Theme } from '@mui/material'
+import { Box, Dialog, DialogTitle, Paper, PaperProps, SxProps, Theme } from '@mui/material'
 import React, { JSXElementConstructor, ReactElement, ReactNode } from 'react'
 import Draggable from 'react-draggable'
 import { create } from 'zustand' 

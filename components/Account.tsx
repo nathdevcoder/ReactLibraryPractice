@@ -54,7 +54,7 @@ export default function Account() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {session && session.user?.roles.map(rol=>(
-            <MenuItem onClick={()=>updateRoleHandler(rol)}>
+            <MenuItem key={rol} onClick={()=>updateRoleHandler(rol)}>
                 <ListItemIcon>
                   <AccountCircleIcon />
                 </ListItemIcon>
