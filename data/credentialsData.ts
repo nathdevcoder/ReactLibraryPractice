@@ -91,19 +91,22 @@ export function ApplyRole(name: string): false | staffStatusType {
     } 
 }
 
-export function AssigneRole(name: string, staff: staffStatusType): defaultResponseType<credentialTypes | null> {
+type applicationResponseType = { userName: string; id: string;  staffStatus: staffStatusType; }
+
+export function AssigneRole(name: string, staff: staffStatusType): defaultResponseType<applicationResponseType | null> {
     try {
         const cred = credentials[name] 
         if(!cred) throw new Error('no account found')
+        if(staff === 'registered') cred.roles.push('staff') 
+        if(staff === 'removed') cred.roles = cred.roles.filter(rl=>rl !== 'staff')
         cred.staffStatus = staff 
-        cred.roles.push('staff')
-        return {success: true, message: 'Application sent', data: cred}
+        return {success: true, message: 'Application sent', data: {id: cred.id, staffStatus: cred.staffStatus, userName: cred.userName}}
     } catch (error:any) {
         return {success: false, message: error.message, data: null}
     } 
 }
 
-export function getApplications(): defaultResponseType<{ userName: string; id: string;  staffStatus: staffStatusType; }[]> {
+export function getApplications(): defaultResponseType<applicationResponseType[]> {
    try {
         const data = Object.values(credentials).filter(cred => cred.staffStatus).map(ft=>({userName:ft.userName, id: ft.id, staffStatus: ft.staffStatus}))  
         return {data, success: true, message: ''}

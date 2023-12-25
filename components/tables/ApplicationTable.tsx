@@ -2,14 +2,16 @@
 import { IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import axios from 'axios'
 import React, { Fragment } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear'; 
 import BlockIcon from '@mui/icons-material/Block';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import { useSnackbar } from 'notistack'
 
 export default function ApplicationTable( ) {
-    const {data:applications, isLoading } = useQuery({
+    const { enqueueSnackbar } = useSnackbar();
+    const {data:applications, isLoading, refetch, } = useQuery({
         queryKey: ['applications'],
         queryFn:  async () => {
             const {data, status} = await axios.get<defaultResponseType<applicationsType>>('/api/auth/aplication') 
@@ -17,11 +19,23 @@ export default function ApplicationTable( ) {
                 return data.data
             } else return []
         }
-      })
+    })
+    const mutation = useMutation({
+        mutationFn(data: {status: staffStatusType, id: string}) {
+            return axios.patch('/api/auth/aplication', data)
+        },
+        onSuccess(data) {
+            enqueueSnackbar('application updated', {variant: 'success'})  
+            refetch()
+        },
+        onError(error) {
+            enqueueSnackbar('oops, something went wrong', {variant: 'error'}) 
+        }
+    })
     if(isLoading) return <p>Loading...</p>
     if(!applications) return <p>No Data</p>
-    function UpdateApplication(status:staffStatusType) {
-        
+    function onMutate(status:staffStatusType, id: string) {
+        mutation.mutate({status, id})
     }
   
   return (
@@ -45,14 +59,16 @@ export default function ApplicationTable( ) {
                     <TableCell align="right">
                         {app.staffStatus === 'aplied' && (
                             <Fragment>
-                                <IconButton onClick={()=>UpdateApplication('registered')}><CheckIcon  /></IconButton>
-                                <IconButton onClick={()=>UpdateApplication('declined')}><ClearIcon /></IconButton>
+                                <IconButton onClick={()=>onMutate('registered',app.id)} disabled={mutation.isPending}><CheckIcon  /></IconButton>
+                                <IconButton onClick={()=>onMutate('declined',app.id)} disabled={mutation.isPending}><ClearIcon /></IconButton>
                             </Fragment>
                         )}
                         {(app.staffStatus === 'declined' || app.staffStatus === 'removed') && ( 
-                            <IconButton onClick={()=>UpdateApplication('registered')}><ControlPointIcon /></IconButton> 
+                            <IconButton onClick={()=>onMutate('registered',app.id)} disabled={mutation.isPending}><ControlPointIcon /></IconButton> 
                         )}
-                        {app.staffStatus === 'registered' && ( <IconButton onClick={()=>UpdateApplication('removed')}><BlockIcon  /></IconButton>  )} 
+                        {app.staffStatus === 'registered' && ( 
+                            <IconButton onClick={()=>onMutate('removed',app.id)} disabled={mutation.isPending}><BlockIcon  /></IconButton>  
+                        )} 
                     </TableCell>
                 </TableRow>
             ))}

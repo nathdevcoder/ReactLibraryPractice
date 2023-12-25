@@ -50,7 +50,7 @@ export default function useFetcher() {
           },
           Successor:  (d)=> {
             onSuccess(d)
-            clientQ.invalidateQueries('getFolders')
+            clientQ.invalidateQueries({queryKey: ['getFolders']})
           }
         }) 
       }
