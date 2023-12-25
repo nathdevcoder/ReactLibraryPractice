@@ -12,3 +12,9 @@ type credentialTypes = {
 }
 
 type credentialsType = {[k: string]: credentialTypes}
+
+type applicationsType = {
+    staffStatus: staffStatusType
+    userName: string
+    id: string
+}[]

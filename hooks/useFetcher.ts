@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import  { useState } from 'react'
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function useFetcher() {
   const clientQ = useQueryClient()

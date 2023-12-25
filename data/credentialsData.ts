@@ -19,6 +19,15 @@ const credentials: credentialsType = {
     roles: ['admin'], 
     plan: null,
     staffStatus: null
+ },
+ asddwad: {
+    userName: 'account', 
+    password: '1234',
+    id: 'asddwad' ,
+    role: 'user',
+    roles: ['user'], 
+    plan: null,
+    staffStatus: 'aplied'
  }
 }
 
@@ -94,9 +103,9 @@ export function AssigneRole(name: string, staff: staffStatusType): defaultRespon
     } 
 }
 
-export function getApplications(): defaultResponseType<credentialTypes[]> {
+export function getApplications(): defaultResponseType<{ userName: string; id: string;  staffStatus: staffStatusType; }[]> {
    try {
-        const data = Object.values(credentials).filter(cred => !cred.staffStatus)
+        const data = Object.values(credentials).filter(cred => cred.staffStatus).map(ft=>({userName:ft.userName, id: ft.id, staffStatus: ft.staffStatus}))  
         return {data, success: true, message: ''}
    } catch (error) {
         return {data: [], success: false, message: 'something went wrong'}

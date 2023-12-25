@@ -3,7 +3,7 @@
 import {Box,Collapse, Drawer, IconButton, Paper,  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import React  from 'react'
 import { create } from 'zustand'  
-import {  useQuery   } from 'react-query'
+import {  useQuery   } from '@tanstack/react-query'
 import axios from 'axios'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';

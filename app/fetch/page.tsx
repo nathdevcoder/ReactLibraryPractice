@@ -2,7 +2,7 @@
 import { Button } from '@mui/material'
 import axios from 'axios'
 import React from 'react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 export default function FormsPage() { 
   const {data, isLoading } = useQuery({
