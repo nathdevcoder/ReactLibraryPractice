@@ -3,3 +3,9 @@ type responceType<t> = {
     success: boolean
     data: t
 }
+
+type defaultResponseType<t> = {
+    message: string
+    success: boolean
+    data: t
+}

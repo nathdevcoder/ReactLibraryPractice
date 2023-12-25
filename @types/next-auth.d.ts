@@ -6,6 +6,8 @@ declare module "next-auth" {
       role: roleType,
       userName: string,
       roles: roleType[]
+      plan: planType
+      staffStatus: staffStatusType
     }
   }
 }

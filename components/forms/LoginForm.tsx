@@ -46,9 +46,7 @@ export default function LoginForm({ onClose }: { onClose?: () => void }) {
           name: values.email,
           password: values.password,
           role: values.role,
-        });
-        console.log(res);
-
+        }); 
         if (!res?.ok) throw Error(res?.error || 'oops  someting went wrong');
         if (onClose) onClose();
       } catch (error: any) { 

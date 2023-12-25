@@ -92,7 +92,7 @@ export default function ThemeRegistry(props: ThemeProviderType) {
     <CacheProvider value={cache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <SnackbarProvider>
+        <SnackbarProvider anchorOrigin={{vertical: 'top', horizontal: 'right'}}>
           {children}
         </SnackbarProvider>
       </ThemeProvider>

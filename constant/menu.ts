@@ -4,8 +4,10 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import DynamicFormIcon from '@mui/icons-material/DynamicForm'; 
 import FolderCopyIcon from '@mui/icons-material/FolderCopy';
 import { MenuListType } from '@/@types/data';
+import { AccountCircleRounded } from '@mui/icons-material';
 const Menu:MenuListType = [
-    {title: 'home', url: '/', Icon: HomeIcon},
+    {title: 'Home', url: '/', Icon: HomeIcon},
+    {title: 'Account', url: '/account', Icon: AccountCircleRounded},
     {title: 'Forms', url: '/forms', Icon: DynamicFormIcon},
     {title: 'Fetchs', url: '/fetch', Icon: ApiIcon},
     {title: 'Tables', url: '/table', Icon: TableChartIcon, subMenu: [

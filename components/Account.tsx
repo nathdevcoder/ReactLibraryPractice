@@ -6,6 +6,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { Logout, PersonAdd, Login } from '@mui/icons-material';
 import { useGlobalModal } from './GlobalModals';
 import LoginForm from './forms/LoginForm';
+import SignupForm from './forms/SignupForm';
 export default function Account() {
     const {data:session, update} = useSession()
     const {openModal} = useGlobalModal()
@@ -29,8 +30,11 @@ export default function Account() {
     const openSignInModal = () => {
         openModal(<LoginForm />)
     }
+    const openSignUpModal = () => {
+      openModal(<SignupForm auth={Boolean(session)} />)
+    }
     const updateRoleHandler = async (role: string) => {
-        await update({ role })
+        await update({ role, type: 'change' })
     }
     const role = session?.user?.role || 'guest' 
     const roleColor = role === "admin" ? "info"
@@ -62,17 +66,17 @@ export default function Account() {
             </MenuItem> 
         ))}
         <Divider />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={openSignUpModal}>
           <ListItemIcon>
             <PersonAdd fontSize="small" />
           </ListItemIcon>
-          Add another account
+          <ListItemText primary={session ? 'Add another account' : 'Sign up'} />
         </MenuItem> 
         <MenuItem onClick={session?SignOutHandler:openSignInModal}>
           <ListItemIcon>
             {session ? <Logout fontSize="small" /> : <Login fontSize="small" />}
           </ListItemIcon>
-          {session?'Log out':'Log in'}
+          <ListItemText primary={session?'Log out':'Log in'}/>  
         </MenuItem>
       </Menu>
 
