@@ -244,6 +244,7 @@ export default function ReactTable() {
           </Table>
         </TableContainer>
       </Paper>
+      <p>{getPageCount()}</p>
       <TableControll dense={dense} setDense={setDense} />
     </Box>
   );
