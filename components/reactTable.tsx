@@ -104,6 +104,8 @@ export default function ReactTable() {
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => { 
+    console.log(newPage);
+    
     setPageSetting(state=> ({...state, pageIndex: newPage}))
   };
   const onFilter = (id: string, value: string) => {

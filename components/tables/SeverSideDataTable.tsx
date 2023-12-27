@@ -1,12 +1,22 @@
 'use client'
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow } from '@mui/material'
-import React, { useReducer, useState } from 'react'
+import React, { ReactNode, useReducer, useRef, useState } from 'react'
 import TableControll from '../snippet/tableControll'
 import TablePaginationActions from '../snippet/tableActions'
 import EnhancedTableToolbar from '../snippet/tableToolbar'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
+type SSDTableType<T> = {
+  endpoint: string
+  queryKey: string
+  densable?: boolean
+  columns: {
+    field:  keyof T
+    name: string
+    cell: (data: (T & { id: number })[keyof T]) => ReactNode
+  }[] 
+}
 
 function tableReducer(state: TableStateType, action:TableActionType): TableStateType {
   const { type, payload } = action;
@@ -18,36 +28,47 @@ function tableReducer(state: TableStateType, action:TableActionType): TableState
     case 'INIT':
       return payload; 
     case 'SORT':
-      const {id, order} = payload
-      return {...state, sort: `${id}-${order}`}; 
+      const {sortId, order} = payload
+      return {...state, sort: `${sortId}-${order}`}; 
+    case 'FILTER':
+      const {filterId, param} = payload
+      return {...state, filter: `${filterId}-${param}`}; 
     default:
       return state;
   }
 }
 const initialTableState = {
-  page: 1, 
+  page: 0, 
   rowsPerPage: 10,
-  count: 0,
-  sort: null
+  sort: null,
+  filter: null
+}
+const tableOptions = {
+   selectable: [],
+   sortable: [],
+   filterable: [] ,
+   count: 0
 }
 
-export default function SeverSideDataTable<T>({endpoint, queryKey}: SSDTableType) {
+export default function SeverSideDataTable<T>({endpoint, queryKey, columns, densable=false}: SSDTableType<T>) {
   const [dense, setDense] = useState(false);
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [tableState, dispatch] = useReducer(tableReducer, initialTableState)
+  const optionsReff = useRef<TableOptionType>({...tableOptions, densable})
 
   const {data: tableData, isLoading, isError } = useQuery({
-    queryKey: [queryKey],
+    queryKey: [queryKey, tableState],
     queryFn:  async () => {
-        const response = await axios.get<{table: T[], state: TableStateType}>(endpoint) 
-        const state = response.data.state
+        const response = await axios.get<TableDataResponse<T>>(endpoint, {
+          params: tableState
+        })  
+        const {state, data, options} = response.data
         for(const key in initialTableState) {
-          if (!state.hasOwnProperty(key)) {
-            throw new Error(`Object does not have a '${key}' property`);
-          }
+          if (!state.hasOwnProperty(key)) throw new Error(`Object does not have a '${key}' property`); 
         } 
         dispatch({type: 'INIT', payload: state})
-        return response.data.table
+        optionsReff.current = options
+        return data
     }
   })
 
@@ -80,13 +101,18 @@ export default function SeverSideDataTable<T>({endpoint, queryKey}: SSDTableType
   };
   const numSelected = selected.length
   const rowCount = 100
+
+  if(isLoading) return <p>...loading</p>
+  if(isError) return <p>error</p>
+  console.log(tableData, optionsReff, tableState);
+  
   return (
+    // <p>loaded</p>
     <TableContainer>
       <EnhancedTableToolbar numSelected={numSelected} />
       <Table
         size={dense ? "small" : "medium"}
-      >
-
+      > 
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox">
@@ -97,31 +123,39 @@ export default function SeverSideDataTable<T>({endpoint, queryKey}: SSDTableType
                 onChange={handleSelectAllClick} 
               />
             </TableCell>
-            {<TableCell ></TableCell>}
+            {columns.map(col=> <TableCell key={Math.random()}>{col.name}</TableCell> )}
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {
-           (()=>{
-            const isItemSelected = isSelected(-1);
-            return <TableRow
-            hover
-            onClick={(event) => handleClick(event, -1)}
-            role="checkbox"
-            aria-checked={isItemSelected}
-            tabIndex={-1} 
-            selected={isItemSelected}
-           >
-            <TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                checked={isItemSelected} 
-              />
-            </TableCell>  
-          </TableRow>
-           })()
-        }
+          {tableData?.map(tbdata=> {
+              const isItemSelected = isSelected(tbdata.id);
+              return (
+                <TableRow
+                  hover
+                  onClick={(event) => handleClick(event, -1)}
+                  role="checkbox"
+                  aria-checked={isItemSelected}
+                  tabIndex={-1} 
+                  selected={isItemSelected}
+                  >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      checked={isItemSelected} 
+                    />
+                  </TableCell>  
+                  {columns.map((cl)=> {
+                    const data = tbdata[cl.field] 
+                    return (
+                      <TableCell key={Math.random()}>
+                        {cl.cell(data)}
+                      </TableCell> 
+                    )
+                  })}
+                </TableRow>
+              )
+          })} 
         </TableBody>
 
         <TableFooter>
@@ -129,7 +163,7 @@ export default function SeverSideDataTable<T>({endpoint, queryKey}: SSDTableType
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
               colSpan={6}
-              count={tableState.count}
+              count={optionsReff.current.count}
               rowsPerPage={tableState.rowsPerPage}
               page={tableState.page}
               onPageChange={(e,page)=>dispatch({type: 'NAVIGATE', payload: page})}

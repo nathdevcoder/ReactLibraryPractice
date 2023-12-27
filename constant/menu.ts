@@ -12,7 +12,8 @@ const Menu:MenuListType = [
     {title: 'Fetchs', url: '/fetch', Icon: ApiIcon},
     {title: 'Tables', url: '/table', Icon: TableChartIcon, subMenu: [
         {title: "Mui", url: '/'},
-        {title: "React Table", url: '/react-table'},
+        {title: "ClientSide DataTable", url: '/react-table'},
+        {title: "ServerSide DataTable", url: '/api-table'},
     ]}, 
     {title: 'File System', url: '/filesystem', Icon: FolderCopyIcon, subMenu: [
         {title: "File System", url: '/'}, 

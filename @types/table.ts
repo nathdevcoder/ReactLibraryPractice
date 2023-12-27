@@ -9,18 +9,21 @@ type tableData = {
 
 type Order = 'asc' | 'desc';
 
-type SSDTableType = {
-  endpoint: string
-  queryKey: string
-  densable?: boolean
-}
  
 type TableStateType  = {
   page: number; 
-  rowsPerPage: number
-  count: number 
+  rowsPerPage: number 
   sort: `${string}-${Order}` | null
+  filter: `${string}-${string}` | null
 }  
+
+type TableOptionType = {
+    sortable: string[]
+    filterable: string[]
+    selectable:  string[]
+    densable: boolean
+    count: number 
+}
 
 type TableActionType = {
   type: 'NAVIGATE' | 'RESIZE';
@@ -31,13 +34,20 @@ type TableActionType = {
 } | {
   type: 'SORT'
   payload: {
-    id: string
+    sortId: string
     order: Order
+  }
+} | {
+  type: 'FILTER'
+  payload: {
+    filterId: string
+    param: string
   }
 } 
 
-type TableDataResponse = {
-    data: tableData[]
+type TableDataResponse<T> = {
+    data: (T & {id: number})[]
     state: TableStateType 
-    
+    options: TableOptionType
 }
+ 
