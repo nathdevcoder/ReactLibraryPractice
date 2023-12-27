@@ -19,7 +19,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<TableDataR
         data: paginated,
         options: {
             selectable: [],
-            sortable: [],
+            sortable: ['grocery', 'place'],
             filterable: [] ,
             count: length,
             densable: true

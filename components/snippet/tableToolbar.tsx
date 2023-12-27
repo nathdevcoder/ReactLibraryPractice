@@ -6,10 +6,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip'; 
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList'; 
-
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 
 interface EnhancedTableToolbarProps {
     numSelected: number;
+    heading?: string
   }
 
 export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
@@ -40,9 +41,9 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             sx={{ flex: '1 1 100%' }}
             variant="h6"
             id="tableTitle"
-            component="div"
+            component="div" 
           >
-            Nutrition
+            {props.heading}
           </Typography>
         )}
         {numSelected > 0 ? (
@@ -52,11 +53,18 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title="Filter list">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
+          <React.Fragment>
+            <Tooltip title="Columns" placement='top' >
+              <IconButton>
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Filter list"  placement='top'>
+              <IconButton>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </React.Fragment>
         )}
       </Toolbar>
     );

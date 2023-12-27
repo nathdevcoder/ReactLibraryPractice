@@ -33,10 +33,7 @@ type TableActionType = {
   payload: TableStateType
 } | {
   type: 'SORT'
-  payload: {
-    sortId: string
-    order: Order
-  }
+  payload: string
 } | {
   type: 'FILTER'
   payload: {

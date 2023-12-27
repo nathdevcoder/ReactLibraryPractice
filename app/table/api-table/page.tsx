@@ -7,6 +7,7 @@ export default function ApiedTable() {
     <SeverSideDataTable<tableData> 
       endpoint='/api/table'
       queryKey='serverside'
+      heading='Server Side Data'
       columns={[{
           field: 'id', name: 'ID', 
           cell: (data) => <p>{data}</p>
