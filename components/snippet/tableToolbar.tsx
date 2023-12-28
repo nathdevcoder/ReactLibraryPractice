@@ -7,14 +7,27 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList'; 
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import {  Menu, MenuItem, } from '@mui/material';
+import TableFilter from './tableFilter';
 
 interface EnhancedTableToolbarProps {
     numSelected: number;
     heading?: string
+    filters: string[]
+    onFilter: (payload: FilterPayload) => void;
+    filterState: `${string}-${Operators}-${string}` | null;
+    
   }
 
-export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected } = props;
+export default function EnhancedTableToolbar({ numSelected, heading, filters, onFilter,filterState }: EnhancedTableToolbarProps) {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   
     return (
       <Toolbar
@@ -43,7 +56,7 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             id="tableTitle"
             component="div" 
           >
-            {props.heading}
+            {heading}
           </Typography>
         )}
         {numSelected > 0 ? (
@@ -60,12 +73,32 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
               </IconButton>
             </Tooltip>
             <Tooltip title="Filter list"  placement='top'>
-              <IconButton>
+              <IconButton onClick={handleClick}>
                 <FilterListIcon />
               </IconButton>
             </Tooltip>
           </React.Fragment>
         )}
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }} 
+          elevation={0}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <MenuItem sx={{bgcolor: 'dimgray'}}><TableFilter filters={filters} onFilter={onFilter} filterState={filterState} onClose={handleClose} /></MenuItem>
+        </Menu>
       </Toolbar>
     );
   }

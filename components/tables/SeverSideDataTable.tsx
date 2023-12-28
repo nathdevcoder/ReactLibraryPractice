@@ -1,11 +1,10 @@
 'use client'
-import { Box, Checkbox, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material'
+import { Checkbox, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material'
 import React, { ReactNode, useReducer, useRef, useState } from 'react'
 import TableControll from '../snippet/tableControll'
 import TablePaginationActions from '../snippet/tableActions'
 import EnhancedTableToolbar from '../snippet/tableToolbar'
 import { useQuery } from '@tanstack/react-query'
-import { visuallyHidden } from '@mui/utils';
 import axios from 'axios'
 
 type SSDTableType<T> = {
@@ -37,8 +36,8 @@ function tableReducer(state: TableStateType, action:TableActionType): TableState
       }
       return {...state, sort: `${payload}-${order}`}; 
     case 'FILTER':
-      const {filterId, param} = payload
-      return {...state, filter: `${filterId}-${param}`}; 
+      const {filterId, param, operator} = payload
+      return {...state, filter: `${filterId}-${operator}-${param}`}; 
     default:
       return state;
   }
@@ -62,7 +61,7 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
   const [tableState, dispatch] = useReducer(tableReducer, initialTableState)
   const optionsReff = useRef<TableOptionType>({...tableOptions, densable})
 
-  const {data: tableData, isLoading, isError } = useQuery({
+  const {data: tableData, isLoading, isError, error } = useQuery({
     queryKey: [queryKey, tableState],
     queryFn:  async () => {
         const response = await axios.get<TableDataResponse<T>>(endpoint, {
@@ -107,15 +106,21 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
   };
   const numSelected = selected.length
   const [orderBy, order] = tableState.sort? tableState.sort.split('-') : []
+
+
   if(isLoading) return <p>...loading</p>
-  if(isError) return <p>error</p>
+  if(isError) return <p>{error.message}</p>
   
   return (
     <TableContainer>
-      <EnhancedTableToolbar numSelected={numSelected} heading={heading}/>
-      <Table
-        size={dense ? "small" : "medium"}
-      > 
+      <EnhancedTableToolbar 
+        numSelected={numSelected} 
+        heading={heading} 
+        filterState={tableState.filter} 
+        filters={optionsReff.current.filterable} 
+        onFilter={(payload)=> dispatch({type: 'FILTER', payload})}
+      />
+      <Table size={dense ? "small" : "medium"} >
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox">
@@ -187,9 +192,8 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
             />
           </TableRow>
         </TableFooter>
-
       </Table>
-      <TableControll dense={dense} setDense={setDense} /> 
+      {optionsReff.current.densable && <TableControll dense={dense} setDense={setDense} /> }
     </TableContainer>
   )
 }

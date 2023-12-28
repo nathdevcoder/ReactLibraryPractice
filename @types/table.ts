@@ -8,13 +8,14 @@ type tableData = {
 }
 
 type Order = 'asc' | 'desc';
+type Operators = 'contains' | 'equals';
 
  
 type TableStateType  = {
   page: number; 
   rowsPerPage: number 
   sort: `${string}-${Order}` | null
-  filter: `${string}-${string}` | null
+  filter: `${string}-${Operators}-${string}` | null
 }  
 
 type TableOptionType = {
@@ -23,6 +24,12 @@ type TableOptionType = {
     selectable:  string[]
     densable: boolean
     count: number 
+}
+
+type FilterPayload = {
+  filterId: string
+  param: string
+  operator: Operators
 }
 
 type TableActionType = {
@@ -36,10 +43,7 @@ type TableActionType = {
   payload: string
 } | {
   type: 'FILTER'
-  payload: {
-    filterId: string
-    param: string
-  }
+  payload: FilterPayload
 } 
 
 type TableDataResponse<T> = {

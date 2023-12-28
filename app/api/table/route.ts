@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest): Promise<NextResponse<TableDataResponse<tableData>>> { 
   const page = request.nextUrl.searchParams.get('page') 
   const rowsPerPage = request.nextUrl.searchParams.get('rowsPerPage') 
-  const filter = request.nextUrl.searchParams.get('filter') as `${string}-${string}` | null
-  const sort = request.nextUrl.searchParams.get('sort')  as `${string}-desc` | `${string}-asc` | null
+  const filter = request.nextUrl.searchParams.get('filter') as `${string}-${Operators}-${string}` | null
+  const sort = request.nextUrl.searchParams.get('sort')  as `${string}-${Order}`  | null
   const pageToNumber = Number(page)
   const rowsPerPageToNumber = Number(rowsPerPage)
   if(!isNaN(pageToNumber) && !isNaN(rowsPerPageToNumber)) {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<TableDataR
         options: {
             selectable: [],
             sortable: ['grocery', 'place'],
-            filterable: [] ,
+            filterable: ['grocery', 'place'],
             count: length,
             densable: true
         },
