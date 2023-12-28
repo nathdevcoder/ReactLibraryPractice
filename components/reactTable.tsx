@@ -167,7 +167,7 @@ export default function ReactTable() {
             ))}
         </Stack>
         <TableContainer>
-          <EnhancedTableToolbar numSelected={0} />
+          <EnhancedTableToolbar numSelected={0} heading='Client Side Data Handling' onFilter={()=>{}} filterState={null} filters={[]} />
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"

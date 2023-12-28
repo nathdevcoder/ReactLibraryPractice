@@ -6,6 +6,7 @@ import TablePaginationActions from '../snippet/tableActions'
 import EnhancedTableToolbar from '../snippet/tableToolbar'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
+import TableLoading from '../snippet/TableLoading'
 
 type SSDTableType<T> = {
   endpoint: string
@@ -56,6 +57,7 @@ const tableOptions = {
 }
 
 export default function SeverSideDataTable<T>({endpoint, queryKey, columns, densable=false, heading}: SSDTableType<T>) {
+  // const [activeColumn, setActiveColumn] = useState(columns.map(c=> ({name: c.name, active: true})))
   const [dense, setDense] = useState(false);
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [tableState, dispatch] = useReducer(tableReducer, initialTableState)
@@ -108,7 +110,7 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
   const [orderBy, order] = tableState.sort? tableState.sort.split('-') : []
 
 
-  if(isLoading) return <p>...loading</p>
+  if(isLoading) return ( <TableLoading cols={columns.map(c=>c.name)} heading={heading} />)
   if(isError) return <p>{error.message}</p>
   
   return (
@@ -153,6 +155,7 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
               return (
                 <TableRow
                   hover
+                  key={tbdata.id}
                   onClick={(event) => handleClick(event, tbdata.id)}
                   role="checkbox"
                   aria-checked={isItemSelected}
