@@ -11,11 +11,9 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel'; 
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox'; 
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch'; 
 import { visuallyHidden } from '@mui/utils';
-import EnhancedTableToolbar from './snippet/tableToolbar';
-import TableControll from './snippet/tableControll';
+import EnhancedTableToolbar from './tables/components/tableToolbar';
+import TableControll from './tables/components/tableControll';
 
 interface Data {
   id: number;

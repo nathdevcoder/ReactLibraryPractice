@@ -1,23 +1,28 @@
 'use client'
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TableSortLabel } from '@mui/material'
 import React, { ReactNode, useReducer, useRef, useState } from 'react'
-import TableControll from '../snippet/tableControll'
-import TablePaginationActions from '../snippet/tableActions'
-import EnhancedTableToolbar from '../snippet/tableToolbar'
+import TableControll from './components/tableControll'
+import TablePaginationActions from './components/tableActions'
+import EnhancedTableToolbar from './components/tableToolbar'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import TableLoading from '../snippet/TableLoading'
+import TableLoading from './components/TableLoading'
+import TableCells from './components/TableCells'
 
 type SSDTableType<T> = {
   endpoint: string
   queryKey: string
   densable?: boolean
   heading?: string
-  columns: {
-    field:  keyof T
-    name: string
-    cell: (data: (T & { id: number })[keyof T]) => ReactNode
-  }[] 
+  columns: ({
+    name: string 
+  } & ({ 
+    field:  keyof T 
+    cellType: CellType
+  }|{ 
+    cellType: 'Custom'
+    cell:  (data: T) => ReactNode 
+  }))[] 
 }
 
 function tableReducer(state: TableStateType, action:TableActionType): TableStateType {
@@ -56,7 +61,7 @@ const tableOptions = {
    count: 0
 }
 
-export default function SeverSideDataTable<T>({endpoint, queryKey, columns, densable=false, heading}: SSDTableType<T>) {
+export default function SeverSideDataTable<T >({endpoint, queryKey, columns, densable=false, heading}: SSDTableType<T>) {
   // const [activeColumn, setActiveColumn] = useState(columns.map(c=> ({name: c.name, active: true})))
   const [dense, setDense] = useState(false);
   const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -135,7 +140,7 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
             </TableCell>
             {columns.map(col=> (
               <TableCell key={Math.random()}>
-                {optionsReff.current.sortable.includes(col.field as string) ? (
+                {col.cellType !== 'Custom' && optionsReff.current.sortable.includes(col.field as string) ? (
                   <TableSortLabel
                     active={orderBy === col.field}
                     direction={order as Order}
@@ -168,14 +173,11 @@ export default function SeverSideDataTable<T>({endpoint, queryKey, columns, dens
                       checked={isItemSelected} 
                     />
                   </TableCell>  
-                  {columns.map((cl)=> {
-                    const data = tbdata[cl.field] 
-                    return (
-                      <TableCell key={Math.random()}>
-                        {cl.cell(data)}
-                      </TableCell> 
-                    )
-                  })}
+                  {columns.map((cl)=>(
+                    <TableCell key={Math.random()}>
+                      {cl.cellType === 'Custom' ? cl.cell(tbdata) : <TableCells type={cl.cellType} data={tbdata[cl.field]} />}
+                    </TableCell> 
+                  ))}
                 </TableRow>
               )
           })} 

@@ -1,5 +1,6 @@
-'use client'
-import SeverSideDataTable from '@/components/tables/SeverSideDataTable'
+'use client' 
+import SeverSideDataTable from '@/components/tables/SeverSideDataTable' 
+import DateCell from '@/components/tables/cells/DateCell'
 import React from 'react'
 
 export default function ApiedTable() {
@@ -8,25 +9,15 @@ export default function ApiedTable() {
       endpoint='/api/table'
       queryKey='serverside'
       heading='Server Side Data'
-      columns={[{
-          field: 'id', name: 'ID', 
-          cell: (data) => <p>{data}</p>
-        },{
-          field: 'grocery', name: 'Grocery', 
-          cell: (data) => <p>{data}</p>
-        },{
-          field: 'price', name: 'Price', 
-          cell: (data) => <p>{data}</p>
-        },{
-          field: 'amount', name: 'Amount', 
-          cell: (data) => <p>{data}</p>
-        },{
-          field: 'calorie', name: 'Calorie', 
-          cell: (data) => <p>{data}</p>
-        },{
-          field: 'place', name: 'Place', 
-          cell: (data) => <p>{data}</p>
-        }
+      columns={[
+        { field: 'id', name: 'ID', cellType: 'Int' },
+        { field: 'grocery', name: 'Grocery', cellType: 'Text' },
+        { field: 'price', name: 'Price', cellType: 'Int' },
+        { field: 'amount', name: 'Amount', cellType: 'Int' },
+        { field: 'calorie', name: 'Calorie', cellType: 'Int' },
+        { field: 'place', name: 'Place', cellType: 'Text' }, 
+        { name: 'Date', cellType: 'Custom', cell: (data) =><DateCell date={new Date()} />},
+        { name: 'Action', cellType: 'Custom', cell: (data) =><p>{data['place']}</p> },
       ]}
     />
   )

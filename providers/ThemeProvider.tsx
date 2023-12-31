@@ -11,6 +11,8 @@ import {
 } from "@mui/material/styles";
 import React from "react";
 import { SnackbarProvider } from "notistack";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 type ThemeProviderType = {
   children: React.ReactNode;
@@ -92,9 +94,11 @@ export default function ThemeRegistry(props: ThemeProviderType) {
     <CacheProvider value={cache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <SnackbarProvider anchorOrigin={{vertical: 'top', horizontal: 'right'}}>
-          {children}
-        </SnackbarProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs} >
+          <SnackbarProvider anchorOrigin={{vertical: 'top', horizontal: 'right'}}>
+            {children}
+          </SnackbarProvider>
+        </LocalizationProvider>
       </ThemeProvider>
     </CacheProvider>
   );

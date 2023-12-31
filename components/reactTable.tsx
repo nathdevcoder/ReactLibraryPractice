@@ -31,9 +31,9 @@ import {
   Select,
   SelectChangeEvent, 
 } from "@mui/material";
-import EnhancedTableToolbar from "./snippet/tableToolbar";
-import TableControll from "./snippet/tableControll";  
-import TablePaginationActions from "./snippet/tableActions";
+import EnhancedTableToolbar from "./tables/components/tableToolbar";
+import TableControll from "./tables/components/tableControll";  
+import TablePaginationActions from "./tables/components/tableActions";
 import SortIcon from '@mui/icons-material/Sort';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 

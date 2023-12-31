@@ -9,6 +9,7 @@ type tableData = {
 
 type Order = 'asc' | 'desc';
 type Operators = 'contains' | 'equals';
+type CellType = 'Text' | 'Int' | 'Date'
 
  
 type TableStateType  = {
