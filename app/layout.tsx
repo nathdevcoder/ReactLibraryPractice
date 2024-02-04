@@ -29,7 +29,7 @@ export default async function RootLayout({
       <ApiProvider session={session}>
         <ThemeRegistry options={{ key: 'mui' }}> 
           <body className={inter.className}> 
-            <Typography variant='h2' my={2} textAlign={'center'}>React Library Practice</Typography>
+            <Typography variant='h3' my={2} textAlign={'center'}>React Library Practice</Typography>
             <AppBar position="static">
               <Toolbar variant="dense">
                 <Container maxWidth='xl'>
