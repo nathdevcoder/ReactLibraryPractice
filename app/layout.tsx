@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.scss'
-import ThemeRegistry from '@/providers/ThemeProvider' 
-import ApiProvider from '@/providers/ApiProvider'
+import ThemeRegistry from '@/providers/ThemeProvider'  
 import { AppBar, Box, Container, Toolbar,   Typography } from '@mui/material'  
-import MenuContainer from '@/components/menuContainer'
-import { getServerSession } from 'next-auth'
-import authOptions  from '@/utils/AuthOptions'
+import MenuContainer from '@/components/menuContainer' 
 import Account from '@/components/Account'
 import GlobalModals from '@/components/GlobalModals'
+import GraphQLProvider from '@/providers/GraphQlProvider'
+import { auth } from '@/auth'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,10 +22,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth();
   return (
     <html lang="en">
-      <ApiProvider session={session}>
+      <GraphQLProvider session={session}>
         <ThemeRegistry options={{ key: 'mui' }}> 
           <body className={inter.className}> 
             <Typography variant='h3' my={2} textAlign={'center'}>React Library Practice</Typography>
@@ -48,7 +47,7 @@ export default async function RootLayout({
             <GlobalModals />
           </body>
         </ThemeRegistry>
-      </ApiProvider>
+      </GraphQLProvider>
     </html>
   )
 }

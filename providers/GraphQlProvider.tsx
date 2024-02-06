@@ -5,19 +5,20 @@ import {
   ApolloProvider,
   createHttpLink,
 } from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
-import { cookies } from 'next/headers'
+import { setContext } from "@apollo/client/link/context"; 
+import { Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_SERVER_URL,
 });
-const cookieStore = cookies()
+ 
 const authLink = setContext((_, { headers }) => {
-  const token = cookieStore.get("token");
+  
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: `Bearer  `,
     },
   };
 });
@@ -29,8 +30,13 @@ const client = new ApolloClient({
 
 export default function GraphQLProvider({
   children,
+  session
 }: {
   children: React.ReactNode;
+  session: Session | null
 }) {
-  return <ApolloProvider client={client}>{children}</ApolloProvider>;
+  return (
+    <SessionProvider session={session}><ApolloProvider client={client}> {children} 
+    </ApolloProvider></SessionProvider>
+  )
 }
