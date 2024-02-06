@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { signIn } from "next-auth/react";
 import { useSnackbar } from 'notistack';
+import login from "@/actions/login";
 
 const validateTest: Schema<{ email: string; password: string; role: string }> =
   object().shape({
@@ -41,13 +42,11 @@ export default function LoginForm({ onClose }: { onClose?: () => void }) {
     validationSchema: validateTest,
     onSubmit: async (values) => {
       try {
-        const res = await signIn("credentials", {
-          redirect: false,
-          name: values.email,
+         await login({ 
+          email: values.email,
           password: values.password,
           role: values.role,
-        }); 
-        if (!res?.ok) throw Error(res?.error || 'oops  someting went wrong');
+        });  
         if (onClose) onClose();
       } catch (error: any) { 
         enqueueSnackbar( error.message ,{variant: 'error', anchorOrigin: {vertical: 'top', horizontal: 'right'}})
