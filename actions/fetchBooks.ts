@@ -1,6 +1,6 @@
 "use server";
 
-import { client } from "@/providers/GraphQlProvider";
+import client from "@/client";
 import { gql } from "@apollo/client";
 
 export default async function getBooks() {
