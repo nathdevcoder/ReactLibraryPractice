@@ -38,14 +38,14 @@ export default async function authenticate({email, password, role}: {email:strin
 
   try {
     const url = process.env.NEXT_PUBLIC_SERVER_URL;
-    if (!url) return null;
+    if (!url) throw Error
     const response = await fetch(url, options);
     if (!response.ok) throw Error;
-    const data = await response.json();
-    console.log(data);
-    if(data.error) return null
-    return data.login;
-  } catch (error) {
+    const {data, errors} = await response.json(); 
+    if(errors) throw new Error(errors[0]?.message)
+    return data.login as {}
+  } catch (error: any) {
+    console.log(error.message); 
     return null;
   }
 }

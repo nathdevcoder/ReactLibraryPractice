@@ -4,10 +4,8 @@ import './globals.scss'
 import ThemeRegistry from '@/providers/ThemeProvider'  
 import { AppBar, Box, Container, Toolbar,   Typography } from '@mui/material'  
 import MenuContainer from '@/components/menuContainer' 
-import Account from '@/components/Account'
-import GlobalModals from '@/components/GlobalModals'
-import GraphQLProvider from '@/providers/GraphQlProvider'
-import { auth } from '@/auth'
+// import Account from '@/components/Account'
+import GlobalModals from '@/components/GlobalModals'   
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,11 +19,9 @@ export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
-  const session = await auth();
+}) {   
   return (
-    <html lang="en">
-      <GraphQLProvider session={session}>
+    <html lang="en">  
         <ThemeRegistry options={{ key: 'mui' }}> 
           <body className={inter.className}> 
             <Typography variant='h3' my={2} textAlign={'center'}>React Library Practice</Typography>
@@ -37,17 +33,16 @@ export default async function RootLayout({
               </Toolbar>
             </AppBar>
             <Container maxWidth='lg'>
-              <Box  my={2} textAlign={'right'}>
+              {/* <Box  my={2} textAlign={'right'}>
                 <Account />
-              </Box>
+              </Box> */}
               <Box my={4}>
                 {children}
               </Box>
             </Container>
             <GlobalModals />
           </body>
-        </ThemeRegistry>
-      </GraphQLProvider>
+        </ThemeRegistry>  
     </html>
   )
 }

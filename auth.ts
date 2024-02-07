@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-// import authenticate from "./actions/login"
-
+import authenticate from "./actions/authenticate"
+import { cookies } from 'next/headers' 
 export const {
   handlers: { GET, POST },
   auth,
@@ -12,36 +12,51 @@ export const {
     Credentials({
         name: 'credentials',
         credentials: {
-            email: {label: 'username', placeholder: 'enter username'},
-            password: {label: 'password', placeholder: 'enter password'},
-            role: {label: 'role', placeholder: 'role'}
+            email: {label: 'username', placeholder: 'enter username',type: 'text'},
+            password: {label: 'password', placeholder: 'enter password', type: 'text'},
+            role: {label: 'role', placeholder: 'role', type: 'text'}
         },
         async authorize({email, password, role}) { 
             if(!email && !role && !password) return null
-            console.log(email, role, password);
-            
-            const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
-
-            if (user) {
+ 
+            //@ts-ignore
+            const user = await authenticate({email, password, role})
+            if(user) {
               return user
-            } else {
-              return null
             }
+            return null
+           
         }
     })
   ],
   secret: process.env.NEXTAUTH_SECRET || "secertasdw",
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
+    async jwt({ token, user, account }) { 
+    
+      if(user) {
+        const cookieStore = cookies()
+        //@ts-ignore
+        cookieStore.set('csrfToken', user.csrfToken, {
+          httpOnly: true, 
+        })
+        //@ts-ignore
+        token.accessToken = user.accessToken
       }
+      if(account) {
+        console.log(account); 
+      }
+       
+
       return token
     },
-    async session({token, session}) {
-        console.log({token});
-        console.log({session}); 
-        return session
+    async session({token, session}) {  
+        return {
+          ...session,
+          hello: 'hello',
+          accessToken: token.accessToken,
+          inSesionSession:session,
+          inSesionToken:token
+        }
     }
 
   },
