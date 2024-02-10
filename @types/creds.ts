@@ -1,4 +1,4 @@
-type roleType = 'admin' | 'user' | 'member' | 'staff'
+type roleType = 'ADMIN' | 'USER' | 'MEMBER' | 'STAFF'
 type staffStatusType = 'aplied' | 'registered' | 'removed' | 'declined' | null
 type planType = 'GOLD' | 'SILVER' | 'STANDARD' | null
 type credentialTypes = {

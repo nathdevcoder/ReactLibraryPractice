@@ -6,17 +6,17 @@ const credentials: credentialsType = {
     userName: 'nathaniel', 
     password: '1234',
     id: 'nadaweda' ,
-    role: 'admin',
-    roles: ['admin', 'user', 'staff', 'member'], 
+    role: 'ADMIN',
+    roles: ['ADMIN', 'USER', 'STAFF', 'MEMBER'], 
     plan: null,
     staffStatus: null
  },
  safaweq: {
-    userName: 'admin', 
+    userName: 'ADMIN', 
     password: '1234',
     id: 'safaweq' ,
-    role: 'admin',
-    roles: ['admin'], 
+    role: 'ADMIN',
+    roles: ['ADMIN'], 
     plan: null,
     staffStatus: null
  },
@@ -24,8 +24,8 @@ const credentials: credentialsType = {
     userName: 'account', 
     password: '1234',
     id: 'asddwad' ,
-    role: 'user',
-    roles: ['user'], 
+    role: 'USER',
+    roles: ['USER'], 
     plan: null,
     staffStatus: 'aplied'
  }
@@ -40,8 +40,8 @@ export function SignUp(name: string, password: string): defaultResponseType<cred
             userName: name, 
             password: password,
             id: newID ,
-            role: 'user',
-            roles: [ 'user' ], 
+            role: 'USER',
+            roles: [ 'USER' ], 
             plan: null,
             staffStatus: null 
         }
@@ -73,8 +73,8 @@ export function UpgradeRole(name: string, plan: planType): credentialTypes | nul
     const cred = credentials[name] 
     if(cred ) { 
         cred.plan = plan
-        cred.role = 'member'
-        cred.roles.push('member')
+        cred.role = 'MEMBER'
+        cred.roles.push('MEMBER')
         return cred
     }
     return null
@@ -97,8 +97,8 @@ export function AssigneRole(name: string, staff: staffStatusType): defaultRespon
     try {
         const cred = credentials[name] 
         if(!cred) throw new Error('no account found')
-        if(staff === 'registered') cred.roles.push('staff') 
-        if(staff === 'removed') cred.roles = cred.roles.filter(rl=>rl !== 'staff')
+        if(staff === 'registered') cred.roles.push('STAFF') 
+        if(staff === 'removed') cred.roles = cred.roles.filter(rl=>rl !== 'STAFF')
         cred.staffStatus = staff 
         return {success: true, message: 'Application sent', data: {id: cred.id, staffStatus: cred.staffStatus, userName: cred.userName}}
     } catch (error:any) {

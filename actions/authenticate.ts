@@ -6,7 +6,7 @@ export default async function authenticate({email, password, role}: {email:strin
     operationName: "Login",
     query: `
         mutation Login($input: LoginInput) {
-        login(input: $input) {
+          login(input: $input) {
             accessToken
             refreshToken
             role
@@ -18,7 +18,7 @@ export default async function authenticate({email, password, role}: {email:strin
             name
             id
             csrfToken
-        }
+          }
         }
     `,
     variables: {

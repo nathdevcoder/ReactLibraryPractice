@@ -1,7 +1,6 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import authenticate from "./actions/authenticate"
-import { cookies } from 'next/headers' 
 export const {
   handlers: { GET, POST },
   auth,
@@ -29,24 +28,17 @@ export const {
         }
     })
   ],
-  secret: process.env.NEXTAUTH_SECRET || "secertasdw",
+  secret: process.env.AUTH_SECRET,
   callbacks: {
     async jwt({ token, user, account }) { 
     
-      if(user) {
-        const cookieStore = cookies()
-        //@ts-ignore
-        cookieStore.set('csrfToken', user.csrfToken, {
-          httpOnly: true, 
-        })
+      if(user) { 
         //@ts-ignore
         token.accessToken = user.accessToken
       }
       if(account) {
         console.log(account); 
       }
-       
-
       return token
     },
     async session({token, session}) {  

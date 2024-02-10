@@ -1,7 +1,14 @@
 
 
 export const publicRoutes = [
-    '/'
+    '/',
+    '/table',
+    '/table/api-table',
+    '/table/react-table',
+    '/forms',
+    '/forms/version2',
+    '/filesystem',
+    '/filesystem/headless'
 ]
 
 export const authRoutes = [

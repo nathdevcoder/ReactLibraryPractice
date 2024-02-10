@@ -6,6 +6,9 @@ import { AppBar, Box, Container, Toolbar,   Typography } from '@mui/material'
 import MenuContainer from '@/components/menuContainer' 
 // import Account from '@/components/Account'
 import GlobalModals from '@/components/GlobalModals'   
+import AuthProvider from '@/providers/AuthProvider'
+import { auth } from '@/auth'
+import ApiProvider from '@/providers/ApiProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,29 +23,34 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {   
+  const session = await auth()
   return (
     <html lang="en">  
-        <ThemeRegistry options={{ key: 'mui' }}> 
-          <body className={inter.className}> 
-            <Typography variant='h3' my={2} textAlign={'center'}>React Library Practice</Typography>
-            <AppBar position="static">
-              <Toolbar variant="dense">
-                <Container maxWidth='xl'>
-                   <MenuContainer />
-                </Container> 
-              </Toolbar>
-            </AppBar>
-            <Container maxWidth='lg'>
-              {/* <Box  my={2} textAlign={'right'}>
-                <Account />
-              </Box> */}
-              <Box my={4}>
-                {children}
-              </Box>
-            </Container>
-            <GlobalModals />
-          </body>
-        </ThemeRegistry>  
+      <AuthProvider session={session}>
+        <ApiProvider session={session}>
+          <ThemeRegistry options={{ key: 'mui' }}> 
+            <body className={inter.className}> 
+              <Typography variant='h3' my={2} textAlign={'center'}>React Library Practice</Typography>
+              <AppBar position="static">
+                <Toolbar variant="dense">
+                  <Container maxWidth='xl'>
+                    <MenuContainer />
+                  </Container> 
+                </Toolbar>
+              </AppBar>
+              <Container maxWidth='lg'>
+                {/* <Box  my={2} textAlign={'right'}>
+                  <Account />
+                </Box> */}
+                <Box my={4}>
+                  {children}
+                </Box>
+              </Container>
+              <GlobalModals />
+            </body>
+          </ThemeRegistry>  
+        </ApiProvider>
+      </AuthProvider>
     </html>
   )
 }
