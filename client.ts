@@ -1,35 +1,27 @@
- 
-import { auth } from "@/auth";
-import {
-  ApolloClient,
-  InMemoryCache, 
-  createHttpLink,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context"; 
+import { auth } from "@/auth"
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client"
+import { setContext } from "@apollo/client/link/context"
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_SERVER_URL,
-}); 
+})
 
-const client = async () => {
+const authLink = setContext(async (_, { headers }) => {
+  // eslint-disable-next-line no-unused-vars
   const session = await auth()
   //@ts-ignore
-  const token = session?.accessToken || ''
-  console.log(token);
-  
-  const authLink = setContext((_, { headers }) => {
-    return {
-      headers: {
-        ...headers,
-        authorization: token,
-      },
-    };
-  });
-  return new ApolloClient({
-    cache: new InMemoryCache(),
-    link: authLink.concat(httpLink),
-  });
-}
+  const token = 'token' // get Token
+  console.log(token)
+  return {
+    headers: {
+      ...headers,
+      authorization: token,
+    },
+  }
+})
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: authLink.concat(httpLink),
+})
 
 export default client
- 
